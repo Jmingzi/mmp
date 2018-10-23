@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>miss todo</title>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+<div id="app">
+    <router-view></router-view>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="./mock.js"></script>
+<script src="./cache.js"></script>
+<script src="./db.js"></script>
+<script id="app-tpl" type="text/html">
+    <div class="todo__wrap">
+        <p class="auto-save">
+            <span class="user" @click="$router.push('/login')">当前用户：{{ currentUser.name }}</span>
+            <span v-if="autoSave === 0">
+                <i class="el-icon-refresh"></i>
+                未保存
+            </span>
+            <span v-else-if="autoSave === 1">
+                <i class="el-icon-loading"></i>
+                保存中
+            </span>
+            <span v-else>
+                <i class="el-icon-refresh"></i>
+                保存成功
+            </span>
+        </p>
+        <div class="todo__category">
+            <el-tabs v-model="activeTabName" stretch>
+                <el-tab-pane label="清单列表" name="first">
+                    <template>
+                        <div class="todo__add" @click="toAddTodo">
+                            <i class="el-icon-plus"></i>
+                            <span>添加清单</span>
+                        </div>
+                        <category-item
+                            v-for="item in todoList"
+                            :key="item.id"
+                            :item="item"
+                            :active-id="activeCategoryId"
+                            @click.native="selectCategory(item)"
+                            @contextmenu.native.prevent="toEditTodo(item)"
+                        >
+                        </category-item>
+                    </template>
+
+                </el-tab-pane>
+                <el-tab-pane label="数据统计" name="second" disabled>数据统计</el-tab-pane>
+            </el-tabs>
+        </div>
+        <div class="todo__list" :style="appColumWidth">
+            <div class="todo__list--wrap">
+                <div class="todo__list--top" v-if="currentCategory.name !== undefined">
+                    <h2>{{ currentCategory.name }}</h2>
+                    <el-input
+                        v-model="newListName"
+                        :placeholder="`添加任务至 ''${currentCategory.name}''`"
+                        @change="addListToCategory()"
+                    >
+                    </el-input>
+                </div>
+                <category-item
+                    v-for="item in (currentCategory.list || [])"
+                    :ref="`list-${item.id}`"
+                    :key="item.id"
+                    :item="{ ...item, color: currentCategory.color }"
+                    :active-id="activeListId"
+                    has-checkbox
+                    @click.native="activeListId = item.id"
+                >
+                </category-item>
+                <p v-if="!currentCategory.list || !currentCategory.list.length" class="todo__empty--data">没有任务呢，放松一下</p>
+            </div>
+        </div>
+        <div class="todo__content" :style="appColumWidth">
+            <div class="todo__content--wrap">
+                <template v-if="currentList.name">
+                    <div class="todo__content--top">
+                        <h2>{{ currentList.name }}</h2>
+                    </div>
+                    <div class="todo__content--area">
+                        <el-input
+                            type="textarea"
+                            placeholder="请输入内容"
+                            :value="currentList.content"
+                            :autosize="{ minRows: 6 }"
+                            @input="updateList"
+                        >
+                        </el-input>
+                    </div>
+                </template>
+                <p v-else class="todo__empty--data">点击任务列表查看详情</p>
+            </div>
+        </div>
+
+        <el-dialog
+            :title="currentEditItem ? '编辑清单' : '添加清单'"
+            :visible.sync="dialogAddTodo"
+        >
+            <el-form :model="form" :rules="rules" ref="addForm">
+                <el-form-item label="清单名称" label-width="80px" prop="name">
+                    <el-input v-model="form.name" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="清单颜色" label-width="80px">
+                    <el-radio-group v-model="form.color">
+                        <el-radio v-for="item in colorConstant" :key="item.id" :label="item.value">
+                            <div class="todo__color-demo" :class="{ 'todo__color-demo-active': item.value === form.color }" :style="{ backgroundColor: item.value }"></div>
+                        </el-radio>
+                    </el-radio-group>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="cancelForm()">取 消</el-button>
+                <el-button type="primary" @click="submitForm()">确 定</el-button>
+            </div>
+        </el-dialog>
+    </div>
+</script>
+<script type="text/html" id="category-tpl">
+    <div class="category-item" :style="{ borderColor: item.color }">
+        <div
+            class="category-item__content"
+            :class="{
+                'category-item__content--active': activeId === item.id
+            }"
+        >
+            <div
+                v-if="activeId === item.id || !hasCheckbox"
+                class="category-item__drag"
+            >
+                <i class="el-icon-sort"></i>
+            </div>
+            <div
+                v-else
+                class="category-item__empty"
+            >
+            </div>
+            <div class="category-item__word">
+                <template v-if="hasCheckbox">
+                    <el-checkbox
+                        :value="item.isComplete"
+                        @change="updateCheckbox"
+                        @click.native.stop=""
+                    >
+                    </el-checkbox>
+                    <input
+                        type="text"
+                        ref="input"
+                        :value="item.name"
+                        placeholder="请输入任务名称"
+                        @input="e => $parent.updateList(e.target.value, 'name')"
+                        @keyup.delete="$parent.deleteListName"
+                    >
+                </template>
+                <span v-else>{{ item.name }}</span>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="login-tpl">
+    <div class="login">
+        <div class="login__form">
+            <template v-if="hasLogin">
+                <h1>miss todo 系统</h1>
+                <div class="bottom-info">
+                    <p>当前登录用户：{{ currentUser.name }}</p>
+                    <el-button>导出到本地</el-button>
+                    <el-button>导入数据</el-button>
+                </div>
+                <br/>
+                <div class="bottom-info">
+                    <el-button type="primary">同步服务器</el-button>
+                    <el-button type="danger" @click="handleOut">退出登录</el-button>
+                </div>
+            </template>
+            <template v-else>
+                <h1>{{ isLogin ? '登录' : '注册' }} miss todo 系统</h1>
+                <el-form
+                    label-position="right"
+                    label-width="80px"
+                    :model="formLabelAlign"
+                    :rules="rules"
+                    ref="ruleForm"
+                >
+                    <el-form-item label="用户名" prop="name">
+                        <el-input v-model="formLabelAlign.name"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="password">
+                        <el-input type="password" v-model="formLabelAlign.password"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" @click="submitForm()">立即{{ isLogin ? '登录' : '注册' }}</el-button>
+                        <el-button @click="resetForm()">重置</el-button>
+                    </el-form-item>
+                </el-form>
+                <div class="bottom-info" v-if="isLogin">
+                    <router-link to="/login?register=1">没有账号，去注册</router-link>
+                </div>
+            </template>
+        </div>
+    </div>
+</script>
+<script>
+  Vue.component('category-item', {
+    data() {
+      return {
+      }
+    },
+    props: {
+      item: Object,
+      activeId: Number,
+      hasCheckbox: {
+        type: Boolean,
+        default: false
+      }
+    },
+    methods: {
+      updateCheckbox(val) {
+        const data = {
+          ...this.item,
+          isComplete: val
+        }
+        this.$parent.updateCategory('list', data)
+      }
+    },
+    template: document.getElementById('category-tpl').innerHTML
+  })
+
+  const App = {
+    data() {
+      return {
+        currentUser: db.getCurrentUser(),
+        appColumWidth: { width: 0 },
+        activeTabName: 'first',
+        todoList: [],
+        activeCategoryId: 0,
+        activeListId: 0,
+        newListName: '',
+        newListDetail: '',
+        autoSave: 2,
+        dialogAddTodo: false,
+        form: {
+          name: '',
+          color: '',
+          // sort: 1
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入清单名称', trigger: 'blur' },
+            { min: 1, max: 50, message: '长度在 1 到 50 个字符', trigger: 'blur' }
+          ]
+        },
+        colorConstant: [
+          { id: 0, value: '' },
+          { id: 1, value: '#339999' },
+          { id: 2, value: '#9933CC' },
+          { id: 3, value: '#FFCC33' },
+          { id: 4, value: '#6666CC' },
+          { id: 5, value: '#CC3333' },
+          { id: 6, value: '#663366' },
+          { id: 7, value: '#FF99CC' },
+          { id: 8, value: '#66CCCC' },
+          { id: 9, value: '#CCCCCC' }
+        ],
+        currentEditItem: null
+      }
+    },
+    computed: {
+      currentCategory() {
+        return this.todoList.find(x => x.id === this.activeCategoryId) || {}
+      },
+      currentList() {
+        return this.currentCategory.list ?
+          this.currentCategory.list.find(x => x.id === this.activeListId) || {} :
+          {}
+      }
+    },
+    created() {
+      this.getCategory()
+    },
+    mounted() {
+      const leftWidth = document.querySelector('.todo__category').getBoundingClientRect().width
+      this.setAppColumWidth(leftWidth)
+
+      window.addEventListener('resize', () => {
+        this.setAppColumWidth(leftWidth)
+      })
+    },
+    methods: {
+      setAppColumWidth(leftWidth) {
+        this.appColumWidth.width = `${(document.body.offsetWidth - leftWidth) / 2}px`
+      },
+      // 去添加清单
+      toAddTodo() {
+        this.currentEditItem = null
+        this.form.name = ''
+        this.form.color = ''
+        this.dialogAddTodo = true
+      },
+      // 去编辑清单
+      toEditTodo(item) {
+        this.currentEditItem = item
+        this.form.name = this.currentEditItem.name
+        this.form.color = this.currentEditItem.color
+        this.dialogAddTodo = true
+        this.selectCategory(item)
+      },
+      // 获取所有的清单
+      getCategory() {
+        db.getTodoList().then(res => {
+          // console.log(res)
+          this.todoList = res
+          if (res[0]) {
+            const { list, id } = res[0]
+            this.activeCategoryId = id
+            this.activeListId = list && list[0] ? list[0].id : 0
+          }
+        })
+      },
+      // 添加清单
+      submitForm() {
+        this.$refs['addForm'].validate((valid) => {
+          if (valid) {
+            if (this.currentEditItem) {
+              const finalData = {
+                ...this.currentEditItem,
+                ...this.form
+              }
+              db.updateTodo(finalData).then(index => {
+                this.$set(this.todoList, index, finalData)
+                this.$message({
+                  message: '修改成功',
+                  type: 'success'
+                })
+                this.cancelForm()
+              })
+            } else {
+              db.addTodo(this.form, this.currentUser).then(res => {
+                this.$message({
+                  message: '添加成功',
+                  type: 'success'
+                })
+                this.todoList.unshift(res)
+                this.activeCategoryId = res.id
+                this.cancelForm()
+              })
+            }
+          } else {
+            return false
+          }
+        })
+      },
+      // 取消添加
+      cancelForm() {
+        this.$refs['addForm'].resetFields()
+        this.dialogAddTodo = false
+      },
+      // 修改清单内容
+      updateCategory(field, val) {
+        if (field === 'list') {
+          const index = this.currentCategory.list.findIndex(x => x.id === val.id)
+          // this.currentCategory.list[index] = val
+          this.$set(this.currentCategory.list, index, val)
+        } else {
+          this.currentCategory[field] = val
+        }
+        db.updateTodo(this.currentCategory)
+      },
+      // 添加任务
+      addListToCategory() {
+        if (this.newListName.trim()) {
+          db.addSubList(this.activeCategoryId, { name: this.newListName }).then(res => {
+            this.$set(this.todoList, res.index, res.item)
+            this.activeListId = this.todoList[0].list[0].id
+            this.newListName = ''
+          })
+        }
+      },
+      // 修改任务内容
+      updateList(val, field = 'content') {
+        if (field === 'name' && val === '') {
+          setTimeout(() => {
+            this.updateList(true, 'isNameEmpty')
+          }, 300)
+        }
+        db.updateSubList(this.activeCategoryId, {
+          ...this.currentList,
+          [field]: val
+        }).then(res => {
+          this.$set(this.todoList, res.index, res.item)
+        })
+      },
+      // 删除任务
+      deleteListName() {
+        if (this.currentList.isNameEmpty) {
+          // 此时需要删除任务
+          db.deleteSubList(this.activeCategoryId, this.currentList).then(res => {
+            this.todoList[res.itemIndex].list.splice(res.listIndex, 1)
+            if (this.todoList[0].list.length) {
+              this.activeListId = this.todoList[0].list[0].id
+              this.$refs[`list-${this.activeListId}`][0].$refs.input.focus()
+            }
+          })
+        }
+      },
+      selectCategory(item) {
+        this.activeCategoryId = item.id
+        this.activeListId = item.list && item.list[0] ? item.list[0].id : 0
+      }
+    },
+    template: document.getElementById('app-tpl').innerHTML
+  }
+
+  const Login = {
+    data() {
+      return {
+        currentUser: null,
+        formLabelAlign: {
+          name: '',
+          password: ''
+        },
+        rules: {
+          name: [
+            { required: true, message: '请输入用户名', trigger: 'blur' },
+            { min: 1, max: 10, message: '长度在 1 到 10 个字符', trigger: 'blur' }
+          ],
+          password: [
+            { required: true, message: '请输入密码', trigger: 'blur' }
+          ]
+        },
+        hasLogin: false
+      }
+    },
+    computed: {
+      isLogin() {
+        return !this.$route.query.register
+      }
+    },
+    watch: {
+      isLogin() {
+        this.currentUser = db.getCurrentUser()
+        if (this.currentUser) {
+          this.hasLogin = true
+        }
+      }
+    },
+    created() {
+      this.currentUser = db.getCurrentUser()
+      if (this.currentUser) {
+        this.hasLogin = true
+      }
+    },
+    methods: {
+      submitForm() {
+        this.$refs['ruleForm'].validate((valid) => {
+          if (valid) {
+            if (this.isLogin) {
+              this.handleLogin()
+            } else {
+              this.handleRegister()
+            }
+          } else {
+            // console.log('error submit!!')
+            return false
+          }
+        })
+      },
+      resetForm() {
+        this.$refs['ruleForm'].resetFields()
+      },
+      handleLogin() {
+        db.login(this.formLabelAlign).then(() => {
+          this.$router.replace('/')
+        })
+      },
+      handleOut() {
+        db.logout().then(() => {
+          location.reload()
+        })
+      },
+      handleRegister() {
+        db.register(this.formLabelAlign).then(res => {
+          this.$message({
+            message: res.msg,
+            type: 'success'
+          })
+          history.back()
+        }).catch(e => {
+          this.$message({
+            message: e.msg,
+            type: 'error'
+          })
+        })
+      }
+    },
+    template: document.getElementById('login-tpl').innerHTML
+  }
+
+  const routes = [
+    {
+      path: '/',
+      component: App,
+      meta: {
+        title: '',
+        auth: true
+      }
+    },
+    {
+      path: '/login',
+      component: Login,
+      meta: {
+        title: '',
+        auth: false
+      }
+    }
+  ]
+
+  const router = new VueRouter({
+    routes // (缩写) 相当于 routes: routes
+  })
+
+  router.beforeEach((to, from , next)=> {
+    // 此处要做匹配，否则会陷入死循环，路由解析失败
+    if (
+        to.matched.some(item=> item.meta.auth) &&
+        !db.getCurrentUser()
+    ) {
+      next('/login')
+    } else {
+      next()
+    }
+  })
+
+  const app = new Vue({
+    router
+  }).$mount('#app')
+</script>
+</body>
+</html>

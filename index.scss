@@ -1,0 +1,185 @@
+html, body, #app {
+  height: 100%;
+}
+body {
+  margin: 0;
+  padding: 0;
+  background: #f2f2f2;
+}
+div {
+  box-sizing: border-box;
+}
+.auto-save {
+  position: fixed;
+  right: 20px;
+  top: 0;
+  font-size: 10px;
+  color: #999999;
+  margin: 0;
+  padding: 0;
+  .user {
+    display: inline-block;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+}
+.todo {
+  &__wrap {
+    display: flex;
+    height: 100%;
+    .el-radio {
+      margin-bottom: 10px;
+    }
+    .el-radio:nth-of-type(6n) {
+      margin-left: 0;
+    }
+  }
+  &__add {
+    padding: 0 25px 10px 25px;
+    cursor: pointer;
+    font-size: 14px;
+    i {
+      //color: #999999;
+    }
+  }
+  &__empty--data {
+    font-size: 16px;
+    color: #999999;
+    text-align: center;
+    padding-top: 40%;
+    margin: 0;
+  }
+  &__category {
+    width: 300px;
+    height: 100%;
+    padding: 15px 0;
+
+    .el-tabs__header {
+      padding: 0 15px;
+    }
+  }
+  &__list {
+    padding: 15px 5px 15px 0;
+    &--top {
+      padding: 15px 15px 15px 25px;
+      h2 {
+        margin: 0;
+        font-weight: normal;
+      }
+      input {
+        margin-top: 15px;
+      }
+    }
+    .category-item {
+      padding: 0;
+      &__content {
+        border-radius: 0;
+      }
+      &__drag {
+        padding: 0 3px;
+      }
+      &__empty {
+        width: 20px;
+        height: 100%;
+      }
+      .el-checkbox {
+        font-weight: normal;
+      }
+      .el-checkbox__label {
+        padding-left: 5px;
+      }
+    }
+  }
+  &__content {
+    padding: 15px 15px 15px 5px;
+    &--top {
+      padding: 15px;
+      h2 {
+        margin: 0;
+        font-weight: normal;
+      }
+    }
+    &--area {
+      // padding: 0 15px 0 15px;
+      margin-top: -6px;
+      .el-textarea__inner {
+        border: none;
+      }
+    }
+  }
+  &__list,
+  &__content {
+    //transition: width .5s linear;
+    height: 100%;
+    &--wrap {
+      height: 100%;
+      background-color: #fff;
+      border-radius: 5px;
+    }
+  }
+  &__color-demo {
+    float: right;
+    // display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-top: -2px;
+    // border-radius: 50%;
+  }
+}
+
+.category-item {
+  border-left: 3px transparent solid;
+  line-height: 40px;
+  padding: 0 10px 0 12px;
+  font-size: 14px;
+  &__content {
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    padding: 0 10px 0 0;
+    cursor: pointer;
+    &--active {
+      background-color: rgba(#99CCFF, .2);
+    }
+  }
+  &__drag {
+    padding: 0 10px;
+    cursor: move;
+    i {
+      color: #999;
+    }
+  }
+  &__word {
+    display: flex;
+    align-items: center;
+    input {
+      border: none;
+      background-color: transparent;
+      font-size: 14px;
+      margin-left: 10px;
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+}
+
+.login {
+  &__form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 400px;
+    transform: translate(-50%, -60%);
+    background-color: #fff;
+    padding: 20px 30px 20px 20px;
+    border-radius: 5px;
+    h1 {
+      margin-bottom: 20px;
+      padding-left: 80px;
+    }
+    .bottom-info {
+      text-align: center;
+    }
+  }
+}
