@@ -123,6 +123,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="cancelForm()">取 消</el-button>
+                <el-button type="danger" v-if="currentEditItem" @click="deleteCategory()">删除清单</el-button>
                 <el-button type="primary" @click="submitForm()">确 定</el-button>
             </div>
         </el-dialog>
@@ -377,6 +378,20 @@
           this.currentCategory[field] = val
         }
         db.updateTodo(this.currentCategory)
+      },
+      // 删除清单
+      deleteCategory() {
+        this.$confirm('确定要删除该清单吗').then(() => {
+          db.deleteList(this.activeCategoryId).then(index => {
+            this.todoList.splice(index, 1)
+            if (this.todoList.length) {
+              const { list, id } = this.todoList[0]
+              this.activeCategoryId = id
+              this.activeListId = list && list[0] ? list[0].id : 0
+            }
+            this.cancelForm()
+          })
+        })
       },
       // 添加任务
       addListToCategory() {

@@ -60,16 +60,18 @@ const db = {
     wsCache.set(LIST_KEY, data)
   },
 
+  // 添加清单
   addTodo(data, currentUser) {
     const id = Date.now()
     return this.getTodoList().then(all => {
-      all.push({
+      const finalData = {
         id,
         ...data,
         userName: currentUser.name
-      })
+      }
+      all.unshift(finalData)
       this.setTodoList(all)
-      return all[all.length - 1]
+      return finalData
     })
   },
 
@@ -79,6 +81,16 @@ const db = {
     return this.getTodoList().then(all => {
       const itemIndex = all.findIndex(x => x.id === category.id)
       all[itemIndex] = category
+      this.setTodoList(all)
+      return itemIndex
+    })
+  },
+
+  // 删除清单
+  deleteList(cateId) {
+    return this.getTodoList().then(all => {
+      const itemIndex = all.findIndex(x => x.id === cateId)
+      all.splice(itemIndex, 1)
       this.setTodoList(all)
       return itemIndex
     })
