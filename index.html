@@ -482,6 +482,11 @@
       handleLogin() {
         db.login(this.formLabelAlign).then(() => {
           this.$router.replace('/')
+        }).catch(e => {
+          this.$message({
+            message: e.msg,
+            type: 'error'
+          })
         })
       },
       handleOut() {

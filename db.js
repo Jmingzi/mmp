@@ -33,8 +33,12 @@ const db = {
   },
 
   login(user) {
-    wsCache.set(LOGIN_KEY, user)
-    return Promise.resolve()
+    const all = this.getAllUser()
+    if (all.some(x => x.name === user.name)) {
+      wsCache.set(LOGIN_KEY, user)
+      return Promise.resolve()
+    }
+    return Promise.reject({ msg: '该用户名不存在' })
   },
 
   getCurrentUser() {
@@ -47,7 +51,9 @@ const db = {
   },
 
   getTodoList() {
-    return Promise.resolve(wsCache.get(LIST_KEY) || [])
+    const list = wsCache.get(LIST_KEY) || []
+    const { name } = this.getCurrentUser()
+    return Promise.resolve(list.filter(x => x.userName === name))
   },
 
   setTodoList(data) {
