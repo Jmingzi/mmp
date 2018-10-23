@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>miss todo</title>
+    <title>Miss 清单</title>
     <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="./index.css">
 </head>
@@ -174,7 +174,7 @@
     <div class="login">
         <div class="login__form">
             <template v-if="hasLogin">
-                <h1>miss todo 系统</h1>
+                <h1>Miss 清单 系统</h1>
                 <div class="bottom-info">
                     <p>当前登录用户：{{ currentUser.name }}</p>
                     <el-button>导出到本地</el-button>
@@ -187,7 +187,7 @@
                 </div>
             </template>
             <template v-else>
-                <h1>{{ isLogin ? '登录' : '注册' }} miss todo 系统</h1>
+                <h1>{{ isLogin ? '登录' : '注册' }} Miss 清单 系统</h1>
                 <el-form
                     label-position="right"
                     label-width="80px"
