@@ -107,6 +107,7 @@
         <el-dialog
             :title="currentEditItem ? '编辑清单' : '添加清单'"
             :visible.sync="dialogAddTodo"
+            width="440px"
         >
             <el-form :model="form" :rules="rules" ref="addForm">
                 <el-form-item label="清单名称" label-width="80px" prop="name">
