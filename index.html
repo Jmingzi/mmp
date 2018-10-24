@@ -84,9 +84,12 @@
                 >
                 </category-item>
                 <div class="todo__list--complete" v-show="currentCategoryList.complete.length">
-                    <div class="todo__list--complete-title" @click="isSpreadComplete = !isSpreadComplete">
-                        <i :class="isSpreadComplete ? 'el-icon-caret-bottom' : 'el-icon-caret-right'"></i>
-                        已完成
+                    <div class="todo__list--complete-title" @click="toggleSpreadComplete">
+                        <span>
+                            <i :class="isSpreadComplete ? 'el-icon-caret-bottom' : 'el-icon-caret-right'"></i>
+                            已完成
+                        </span>
+                        <span v-if="!isSpreadComplete">{{ currentCategoryList.complete.length }}</span>
                     </div>
                     <div v-show="isSpreadComplete">
                         <category-item
@@ -192,7 +195,7 @@
                 <span class="category-item__word-wrap" v-else>{{ item.name }}</span>
             </div>
             <span v-if="!hasCheckbox" class="category-item__unCompleteNum">
-                {{ (item.list || []).filter(x => x.isComplete !== true).length }}
+                {{ (item.list || []).filter(x => x.isComplete !== true).length || '' }}
             </span>
         </div>
     </div>
@@ -279,7 +282,7 @@
         newListDetail: '',
         autoSave: 2,
         dialogAddTodo: false,
-        isSpreadComplete: true,
+        spreadCompleteMap: {},
         form: {
           name: '',
           color: '',
@@ -331,6 +334,10 @@
           })
         }
         return { complete, unComplete }
+      },
+      // 是否显示 当前清单的已完成列表
+      isSpreadComplete() {
+        return this.spreadCompleteMap[this.activeCategoryId] !== false
       }
     },
     created() {
@@ -347,6 +354,9 @@
     methods: {
       setAppColumWidth(leftWidth) {
         this.appColumWidth.width = `${(document.body.offsetWidth - leftWidth) / 2}px`
+      },
+      toggleSpreadComplete() {
+        this.$set(this.spreadCompleteMap, this.activeCategoryId, !this.isSpreadComplete)
       },
       // 去添加清单
       toAddTodo() {

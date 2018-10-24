@@ -57,6 +57,12 @@ div {
     .el-tabs__header {
       padding: 0 15px;
     }
+    .el-tabs__item.is-active {
+      color: #333333;
+    }
+    .el-tabs__active-bar {
+      background-color: #333333;
+    }
   }
   &__list {
     padding: 15px 5px 15px 0;
@@ -91,10 +97,13 @@ div {
     }
     &--complete {
       &-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         line-height: 40px;
         color: #999999;
         font-size: 12px;
-        padding: 0 5px;
+        padding: 0 15px 0 5px;
         cursor: pointer;
       }
       .el-checkbox__input.is-checked .el-checkbox__inner {
