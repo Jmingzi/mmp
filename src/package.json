@@ -1,0 +1,28 @@
+{
+  "main": "index.html",
+  "name": "Miss 清单",
+  "description": "Miss 清单系统",
+  "version": "0.1.0",
+  "keywords": [ "Miss", "清单" ],
+  "window": {
+    "icon": "link.png",
+    "toolbar": true,
+    "width": 1000,
+    "height": 500,
+    "resizable": true,
+    "fullscreen": false,
+    "show_in_taskbar": true,
+    "frame": true,
+    "position": "center",
+    "min_width": 800,
+    "min_height": 600,
+    "max_width": 1200,
+    "kiosk": false
+  },
+  "user-agent": "%name %ver %nwver %webkit_ver %osinfo",
+  "webkit": {
+    "plugin": true,
+    "java": false,
+    "page-cache": false
+  }
+}

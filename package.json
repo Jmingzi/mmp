@@ -1,0 +1,30 @@
+{
+  "name": "miss-todo",
+  "version": "1.0.0",
+  "description": "",
+  "directories": {
+    "src/lib": "src/lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nw ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jmingzi/todo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Jmingzi/todo/issues"
+  },
+  "homepage": "https://github.com/Jmingzi/todo#readme",
+  "devDependencies": {
+    "nw-builder": "^3.5.4"
+  },
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-util": "^3.0.8"
+  }
+}
