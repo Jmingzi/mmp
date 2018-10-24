@@ -53,7 +53,7 @@
                             :item="item"
                             :active-id="activeCategoryId"
                             @click.native="selectCategory(item)"
-                            @contextmenu.native.prevent="toEditTodo(item)"
+                            @contextmenu.native.prevent="e => toEditTodo(e, item)"
                         >
                         </category-item>
                     </template>
@@ -366,12 +366,33 @@
         this.dialogAddTodo = true
       },
       // 去编辑清单
-      toEditTodo(item) {
-        this.currentEditItem = item
-        this.form.name = this.currentEditItem.name
-        this.form.color = this.currentEditItem.color
-        this.dialogAddTodo = true
-        this.selectCategory(item)
+      toEditTodo(ev, item) {
+        if (nw) {
+          const todoListMenu = new nw.Menu()
+          todoListMenu.append(new nw.MenuItem({
+            label: '编辑',
+            click: () => {
+              this.currentEditItem = item
+              this.form.name = this.currentEditItem.name
+              this.form.color = this.currentEditItem.color
+              this.dialogAddTodo = true
+              this.selectCategory(item)
+            }
+          }))
+          todoListMenu.append(new nw.MenuItem({
+            label: '删除' ,
+            click: () => {
+              this.deleteCategory()
+            }
+          }))
+          todoListMenu.popup(ev.x, ev.y)
+        } else {
+          this.currentEditItem = item
+          this.form.name = this.currentEditItem.name
+          this.form.color = this.currentEditItem.color
+          this.dialogAddTodo = true
+          this.selectCategory(item)
+        }
       },
       // 获取所有的清单
       getCategory() {

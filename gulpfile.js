@@ -4,10 +4,10 @@ var gutil = require('gulp-util')
 
 gulp.task('nw', function () {
   var nw = new NwBuilder({
-    version: '0.14.6',
+    // version: '0.14.6',
     files: './src/**',
-    macIcns: './icons/icon.icns',
-    macPlist: {mac_bundle_id: 'myPkg'},
+    // macIcns: './icons/icon.icns',
+    // macPlist: {mac_bundle_id: 'myPkg'},
     platforms: ['osx64']
   })
 
