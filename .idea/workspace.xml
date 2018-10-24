@@ -2,14 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f2cf331f-073f-4cdd-8620-f64708939928" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/lib/element.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/element.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/router.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/lib/vue.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/index.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.css.map" beforeDir="false" afterPath="$PROJECT_DIR$/index.css.map" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.scss" beforeDir="false" afterPath="$PROJECT_DIR$/index.scss" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -51,14 +45,14 @@
         <counts>
           <entry key="html" value="7635" />
           <entry key="js" value="1982" />
-          <entry key="scss" value="2072" />
+          <entry key="scss" value="2085" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="HTML" value="7635" />
           <entry key="JavaScript" value="1982" />
-          <entry key="SCSS" value="2072" />
+          <entry key="SCSS" value="2085" />
         </counts>
       </usages-collector>
     </session>
@@ -80,8 +74,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/index.scss">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="360">
-              <caret line="176" column="21" lean-forward="true" selection-start-line="176" selection-start-column="21" selection-end-line="176" selection-end-column="21" />
+            <state relative-caret-position="233">
+              <caret line="211" column="24" selection-start-line="211" selection-start-column="24" selection-end-line="211" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -184,12 +178,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1540258746586</updated>
-      <workItem from="1540258748012" duration="31809000" />
+      <workItem from="1540258748012" duration="32061000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="31809000" />
+    <option name="totallyTimeSpent" value="32061000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -205,9 +199,9 @@
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.1556791" />
+      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.1556791" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" order="0" weight="0.32876712" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="0" visible="true" weight="0.32876712" />
       <window_info anchor="bottom" id="Event Log" order="1" side_tool="true" />
       <window_info anchor="bottom" id="Version Control" order="2" show_stripe_button="false" />
       <window_info anchor="bottom" id="Docker" order="3" show_stripe_button="false" />
@@ -312,8 +306,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.scss">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="176" column="21" lean-forward="true" selection-start-line="176" selection-start-column="21" selection-end-line="176" selection-end-column="21" />
+        <state relative-caret-position="233">
+          <caret line="211" column="24" selection-start-line="211" selection-start-column="24" selection-end-line="211" selection-end-column="24" />
         </state>
       </provider>
     </entry>
