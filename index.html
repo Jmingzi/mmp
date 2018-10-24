@@ -13,16 +13,19 @@
 <div id="app">
     <router-view></router-view>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script src="./lib/vue.js"></script>
+<script src="./lib/router.js"></script>
+<script src="./lib/element.js"></script>
 <script src="./mock.js"></script>
 <script src="./cache.js"></script>
 <script src="./db.js"></script>
 <script id="app-tpl" type="text/html">
     <div class="todo__wrap">
         <p class="auto-save">
-            <span class="user" @click="$router.push('/login')">当前用户：{{ currentUser.name }}</span>
+            <span class="user" @click="$router.push('/login')">
+                当前用户：{{ currentUser.name }}
+                <i class="el-icon-caret-bottom"></i>
+            </span>
             <span v-if="autoSave === 0">
                 <i class="el-icon-refresh"></i>
                 未保存
@@ -71,7 +74,7 @@
                     </el-input>
                 </div>
                 <category-item
-                    v-for="item in (currentCategory.list || [])"
+                    v-for="item in currentCategoryList.unComplete"
                     :ref="`list-${item.id}`"
                     :key="item.id"
                     :item="{ ...item, color: currentCategory.color }"
@@ -80,6 +83,24 @@
                     @click.native="activeListId = item.id"
                 >
                 </category-item>
+                <div class="todo__list--complete" v-show="currentCategoryList.complete.length">
+                    <div class="todo__list--complete-title" @click="isSpreadComplete = !isSpreadComplete">
+                        <i :class="isSpreadComplete ? 'el-icon-caret-bottom' : 'el-icon-caret-right'"></i>
+                        已完成
+                    </div>
+                    <div v-show="isSpreadComplete">
+                        <category-item
+                            v-for="item in currentCategoryList.complete"
+                            :ref="`list-${item.id}`"
+                            :key="item.id"
+                            :item="{ ...item, color: currentCategory.color }"
+                            :active-id="activeListId"
+                            has-checkbox
+                            @click.native="activeListId = item.id"
+                        >
+                        </category-item>
+                    </div>
+                </div>
                 <p v-if="!currentCategory.list || !currentCategory.list.length" class="todo__empty--data">没有任务呢，放松一下</p>
             </div>
         </div>
@@ -94,7 +115,7 @@
                             type="textarea"
                             placeholder="请输入内容"
                             :value="currentList.content"
-                            :autosize="{ minRows: 6 }"
+                            :autosize="{ minRows: 15 }"
                             @input="updateList"
                         >
                         </el-input>
@@ -148,7 +169,10 @@
                 class="category-item__empty"
             >
             </div>
-            <div class="category-item__word">
+            <div
+                class="category-item__word"
+                :class="{ 'category-item__word-border': hasCheckbox }"
+            >
                 <template v-if="hasCheckbox">
                     <el-checkbox
                         :value="item.isComplete"
@@ -165,8 +189,11 @@
                         @keyup.delete="$parent.deleteListName"
                     >
                 </template>
-                <span v-else>{{ item.name }}</span>
+                <span class="category-item__word-wrap" v-else>{{ item.name }}</span>
             </div>
+            <span v-if="!hasCheckbox" class="category-item__unCompleteNum">
+                {{ (item.list || []).filter(x => x.isComplete !== true).length }}
+            </span>
         </div>
     </div>
 </script>
@@ -252,6 +279,7 @@
         newListDetail: '',
         autoSave: 2,
         dialogAddTodo: false,
+        isSpreadComplete: true,
         form: {
           name: '',
           color: '',
@@ -279,13 +307,30 @@
       }
     },
     computed: {
+      // 当前清单对象
       currentCategory() {
         return this.todoList.find(x => x.id === this.activeCategoryId) || {}
       },
+      // 当前任务对象
       currentList() {
         return this.currentCategory.list ?
           this.currentCategory.list.find(x => x.id === this.activeListId) || {} :
           {}
+      },
+      // 当前任务列表 分为已完成 未完成
+      currentCategoryList() {
+        const complete = []
+        const unComplete = []
+        if (this.currentCategory.list) {
+          this.currentCategory.list.forEach(x => {
+            if (x.isComplete) {
+              complete.unshift(x)
+            } else {
+              unComplete.push(x)
+            }
+          })
+        }
+        return { complete, unComplete }
       }
     },
     created() {

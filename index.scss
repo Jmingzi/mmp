@@ -89,6 +89,22 @@ div {
         padding-left: 5px;
       }
     }
+    &--complete {
+      &-title {
+        line-height: 40px;
+        color: #999999;
+        font-size: 12px;
+        padding: 0 5px;
+        cursor: pointer;
+      }
+      .el-checkbox__input.is-checked .el-checkbox__inner {
+        background-color: #cccccc;
+        border-color: #cccccc;
+      }
+      input {
+        color: #cccccc;
+      }
+    }
   }
   &__content {
     padding: 15px 15px 15px 5px;
@@ -100,7 +116,6 @@ div {
       }
     }
     &--area {
-      // padding: 0 15px 0 15px;
       margin-top: -6px;
       .el-textarea__inner {
         border: none;
@@ -109,7 +124,6 @@ div {
   }
   &__list,
   &__content {
-    //transition: width .5s linear;
     height: 100%;
     &--wrap {
       height: 100%;
@@ -119,11 +133,9 @@ div {
   }
   &__color-demo {
     float: right;
-    // display: inline-block;
     width: 16px;
     height: 16px;
     margin-top: -2px;
-    // border-radius: 50%;
   }
 }
 
@@ -133,14 +145,22 @@ div {
   padding: 0 10px 0 12px;
   font-size: 14px;
   &__content {
+    position: relative;
     display: flex;
     align-items: center;
     border-radius: 5px;
-    padding: 0 10px 0 0;
     cursor: pointer;
+    padding: 0 20px 0 0;
     &--active {
       background-color: rgba(#99CCFF, .2);
     }
+  }
+  &__unCompleteNum {
+    position: absolute;
+    right: 5px;
+    top: 0;
+    font-size: 12px;
+    color: #999999;
   }
   &__drag {
     padding: 0 10px;
@@ -150,9 +170,20 @@ div {
     }
   }
   &__word {
+    width: 100%;
     display: flex;
     align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    &-wrap {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    &-border {
+      border-bottom: 1px #f2f2f2 solid;
+    }
     input {
+      width: 100%;
       border: none;
       background-color: transparent;
       font-size: 14px;
