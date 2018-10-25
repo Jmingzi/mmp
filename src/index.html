@@ -409,12 +409,9 @@
         const loading = this.$loading()
         db.getTodoList().then(res => {
           loading.close()
-          // console.log(res)
           this.todoList = res
           if (res.length) {
-            // const { objectId } =
             this.activeCategoryId = res[0].objectId
-            // this.activeListId = list && list[0] ? list[0].id : 0
             this.setActiveListId()
           }
         })
@@ -425,10 +422,10 @@
           if (valid) {
             const loading = this.$loading()
             if (this.currentEditItem) {
-              db.updateTodo(this.form, this.currentEditItem.objectId).then(result => {
+              db.updateTodo(this.form, this.currentEditItem.objectId).then(() => {
                 loading.close()
                 const index = this.todoList.findIndex(x => x.objectId === this.currentEditItem.objectId)
-                this.$set(this.todoList, index, result)
+                this.$set(this.todoList, index, { ...this.currentCategory, ...this.form })
                 this.$message({
                   message: '修改成功',
                   type: 'success'

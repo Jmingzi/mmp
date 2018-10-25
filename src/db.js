@@ -45,12 +45,10 @@ const db = {
       // console.log(current.toJSON())
       return current.toJSON()
     }
-    // return wsCache.get(LOGIN_KEY)
     return null
   },
 
   logout() {
-    // wsCache.delete(LOGIN_KEY)
     User.logOut()
     return Promise.resolve()
   },
@@ -59,15 +57,11 @@ const db = {
     const { objectId } = this.getCurrentUser()
     const query = new Query(ToDoTable)
     query.equalTo('userId', objectId)
-    query.descending('updatedAt')
+    query.descending('createdAt')
     return query.find().then(res => {
       return res.map(x => x.toJSON())
     })
   },
-
-  // setTodoList(data) {
-  //   wsCache.set(LIST_KEY, data)
-  // },
 
   // 添加清单
   addTodo(data) {
