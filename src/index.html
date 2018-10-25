@@ -206,14 +206,16 @@
             <template v-if="hasLogin">
                 <h1>Miss 清单 系统</h1>
                 <div class="bottom-info">
-                    <p>当前登录用户：{{ currentUser.name }}</p>
-                    <el-button>导出到本地</el-button>
-                    <el-button>导入数据</el-button>
+                    <p><span>当前登录用户：{{ currentUser.name }}</span></p>
+                    <p>
+                        <el-button size="mini" type="primary" @click="$router.push('/')">进入系统</el-button>
+                        <el-button size="mini" type="danger" @click="handleOut">退出登录</el-button>
+                    </p>
                 </div>
-                <br/>
                 <div class="bottom-info">
-                    <el-button type="primary">同步服务器</el-button>
-                    <el-button type="danger" @click="handleOut">退出登录</el-button>
+                    <el-button size="mini">导入数据</el-button>
+                    <el-button size="mini">导出数据</el-button>
+                    <el-button size="mini">同步服务器数据</el-button>
                 </div>
             </template>
             <template v-else>
@@ -573,7 +575,8 @@
       },
       handleLogin() {
         db.login(this.formLabelAlign).then(() => {
-          this.$router.replace('/')
+          // this.$router.replace('/')
+          location.reload()
         }).catch(e => {
           this.$message({
             message: e.msg,
