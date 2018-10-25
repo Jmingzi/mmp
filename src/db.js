@@ -147,7 +147,7 @@ const db = {
   syncLocal() {
     const HAS_SYNC = 'HAS_SYNC'
     const localList = wsCache.get(LIST_KEY)
-    let currentUser = db.getCurrentUser()
+    const currentUser = db.getCurrentUser()
     if (
         !wsCache.get(HAS_SYNC) &&
         localList &&
@@ -159,7 +159,7 @@ const db = {
         Object.keys(item).forEach(key => {
           todoSync.set(key, item[key])
         })
-        currentUser = currentUser.toJSON()
+        // currentUser = currentUser.toJSON()
         todoSync.set('userId', currentUser.objectId)
         todoSync.set('userName', currentUser.username)
         todoSync.save().then(() => {
