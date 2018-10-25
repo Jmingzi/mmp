@@ -66,8 +66,10 @@ div {
     .todo__list .category-item__drag {
       padding: 0 3px; }
     .todo__list .category-item__empty {
-      width: 20px;
+      padding: 0 3px;
       height: 100%; }
+      .todo__list .category-item__empty i {
+        visibility: hidden; }
     .todo__list .category-item .el-checkbox {
       font-weight: normal; }
     .todo__list .category-item .el-checkbox__label {

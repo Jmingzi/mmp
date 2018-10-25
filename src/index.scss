@@ -86,8 +86,11 @@ div {
         padding: 0 3px;
       }
       &__empty {
-        width: 20px;
+        padding: 0 3px;
         height: 100%;
+        i {
+          visibility: hidden;
+        }
       }
       .el-checkbox {
         font-weight: normal;

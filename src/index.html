@@ -163,7 +163,7 @@
             }"
         >
             <div
-                v-if="item[hasCheckbox ? 'id' : 'objectId'] || !hasCheckbox"
+                v-if="item[hasCheckbox ? 'id' : 'objectId'] === activeId || !hasCheckbox"
                 class="category-item__drag"
             >
                 <i class="el-icon-sort"></i>
@@ -172,6 +172,7 @@
                 v-else
                 class="category-item__empty"
             >
+                <i class="el-icon-sort"></i>
             </div>
             <div
                 class="category-item__word"
