@@ -590,7 +590,6 @@
         this.currentUser = db.getCurrentUser()
         if (this.currentUser) {
           this.hasLogin = true
-          db.syncLocal()
         }
       }
     },
@@ -598,6 +597,7 @@
       this.currentUser = db.getCurrentUser()
       if (this.currentUser) {
         this.hasLogin = true
+        db.syncLocal()
       }
     },
     methods: {
