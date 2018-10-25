@@ -590,11 +590,11 @@
         this.currentUser = db.getCurrentUser()
         if (this.currentUser) {
           this.hasLogin = true
+          db.syncLocal()
         }
       }
     },
     created() {
-      db.syncLocal()
       this.currentUser = db.getCurrentUser()
       if (this.currentUser) {
         this.hasLogin = true
