@@ -6,7 +6,7 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Miss 清单</title>
-    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="lib/element.css">
     <link rel="stylesheet" href="index.css">
 </head>
 <body>
@@ -16,6 +16,7 @@
 <script src="lib/vue.js"></script>
 <script src="lib/router.js"></script>
 <script src="lib/element.js"></script>
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.10.0/dist/av-min.js"></script>
 <script src="nw.config.js"></script>
 <script src="cache.js"></script>
 <script src="db.js"></script>
@@ -23,7 +24,7 @@
     <div class="todo__wrap">
         <p class="auto-save">
             <span class="user" @click="$router.push('/login')">
-                当前用户：{{ currentUser.name }}
+                当前用户：{{ currentUser.username }}
                 <i class="el-icon-caret-bottom"></i>
             </span>
             <span v-if="autoSave === 0">
@@ -49,7 +50,7 @@
                         </div>
                         <category-item
                             v-for="item in todoList"
-                            :key="item.id"
+                            :key="item.objectId"
                             :item="item"
                             :active-id="activeCategoryId"
                             @click.native="selectCategory(item)"
@@ -158,11 +159,11 @@
         <div
             class="category-item__content"
             :class="{
-                'category-item__content--active': activeId === item.id
+                'category-item__content--active': activeId === item[hasCheckbox ? 'id' : 'objectId']
             }"
         >
             <div
-                v-if="activeId === item.id || !hasCheckbox"
+                v-if="item[hasCheckbox ? 'id' : 'objectId'] || !hasCheckbox"
                 class="category-item__drag"
             >
                 <i class="el-icon-sort"></i>
@@ -186,9 +187,9 @@
                     <input
                         type="text"
                         ref="input"
-                        :value="item.name"
+                        :value="inputValue !== undefined ? inputValue : item.name"
                         placeholder="请输入任务名称"
-                        @input="e => $parent.updateList(e.target.value, 'name')"
+                        @input="updateListName"
                         @keyup.delete="$parent.deleteListName"
                     >
                 </template>
@@ -206,13 +207,13 @@
             <template v-if="hasLogin">
                 <h1>Miss 清单 系统</h1>
                 <div class="bottom-info">
-                    <p><span>当前登录用户：{{ currentUser.name }}</span></p>
+                    <p><span>当前登录用户：{{ currentUser.username }}</span></p>
                     <p>
                         <el-button size="mini" type="primary" @click="$router.push('/')">进入系统</el-button>
                         <el-button size="mini" type="danger" @click="handleOut">退出登录</el-button>
                     </p>
                 </div>
-                <div class="bottom-info">
+                <div class="bottom-info" v-if="false">
                     <el-button size="mini">导入数据</el-button>
                     <el-button size="mini">导出数据</el-button>
                     <el-button size="mini">同步服务器数据</el-button>
@@ -238,8 +239,9 @@
                         <el-button @click="resetForm()">重置</el-button>
                     </el-form-item>
                 </el-form>
-                <div class="bottom-info" v-if="isLogin">
-                    <router-link to="/login?register=1">没有账号，去注册</router-link>
+                <div class="bottom-info">
+                    <router-link v-if="isLogin" to="/login?register=1">没有账号，去注册</router-link>
+                    <router-link v-else to="/login">去登录</router-link>
                 </div>
             </template>
         </div>
@@ -249,11 +251,12 @@
   Vue.component('category-item', {
     data() {
       return {
+        inputValue: undefined
       }
     },
     props: {
       item: Object,
-      activeId: Number,
+      activeId: String,
       hasCheckbox: {
         type: Boolean,
         default: false
@@ -266,6 +269,10 @@
           isComplete: val
         }
         this.$parent.updateCategory('list', data)
+      },
+      updateListName(e) {
+        this.inputValue = e.target.value
+        this.$parent.updateList(e.target.value, 'name')
       }
     },
     template: document.getElementById('category-tpl').innerHTML
@@ -282,7 +289,7 @@
         activeListId: 0,
         newListName: '',
         newListDetail: '',
-        autoSave: 2,
+        autoSave: 0,
         dialogAddTodo: false,
         spreadCompleteMap: {},
         form: {
@@ -308,13 +315,14 @@
           { id: 8, value: '#66CCCC' },
           { id: 9, value: '#CCCCCC' }
         ],
-        currentEditItem: null
+        currentEditItem: null,
+        timer: null
       }
     },
     computed: {
       // 当前清单对象
       currentCategory() {
-        return this.todoList.find(x => x.id === this.activeCategoryId) || {}
+        return this.todoList.find(x => x.objectId === this.activeCategoryId) || {}
       },
       // 当前任务对象
       currentList() {
@@ -369,7 +377,7 @@
       },
       // 去编辑清单
       toEditTodo(ev, item) {
-        if (nw) {
+        if (window.nw) {
           const todoListMenu = new nw.Menu()
           todoListMenu.append(new nw.MenuItem({
             label: '编辑',
@@ -398,13 +406,16 @@
       },
       // 获取所有的清单
       getCategory() {
+        const loading = this.$loading()
         db.getTodoList().then(res => {
+          loading.close()
           // console.log(res)
           this.todoList = res
-          if (res[0]) {
-            const { list, id } = res[0]
-            this.activeCategoryId = id
-            this.activeListId = list && list[0] ? list[0].id : 0
+          if (res.length) {
+            // const { objectId } =
+            this.activeCategoryId = res[0].objectId
+            // this.activeListId = list && list[0] ? list[0].id : 0
+            this.setActiveListId()
           }
         })
       },
@@ -413,12 +424,11 @@
         this.$refs['addForm'].validate((valid) => {
           if (valid) {
             if (this.currentEditItem) {
-              const finalData = {
-                ...this.currentEditItem,
-                ...this.form
-              }
-              db.updateTodo(finalData).then(index => {
-                this.$set(this.todoList, index, finalData)
+              const loading = this.$loading()
+              db.updateTodo(this.form, this.currentEditItem.objectId).then(result => {
+                loading.close()
+                const index = this.todoList.findIndex(x => x.objectId === this.currentEditItem.objectId)
+                this.$set(this.todoList, index, result)
                 this.$message({
                   message: '修改成功',
                   type: 'success'
@@ -427,12 +437,13 @@
               })
             } else {
               db.addTodo(this.form, this.currentUser).then(res => {
+                loading.close()
                 this.$message({
                   message: '添加成功',
                   type: 'success'
                 })
                 this.todoList.unshift(res)
-                this.activeCategoryId = res.id
+                this.activeCategoryId = res.objectId
                 this.cancelForm()
               })
             }
@@ -447,15 +458,34 @@
         this.dialogAddTodo = false
       },
       // 修改清单内容
-      updateCategory(field, val) {
+      updateCategory(field, val, hasLoading = true) {
+        let data
         if (field === 'list') {
+          if (!this.currentCategory.list) {
+            this.currentCategory.list = []
+          }
           const index = this.currentCategory.list.findIndex(x => x.id === val.id)
-          // this.currentCategory.list[index] = val
-          this.$set(this.currentCategory.list, index, val)
+          if (index > -1) {
+            // 修改任务内容
+            this.$set(this.currentCategory.list, index, val)
+          } else {
+            // 处理新增任务
+            this.activeListId = val.id
+            this.currentCategory.list.unshift(val)
+            const itemIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
+            this.$set(this.todoList, itemIndex, this.currentCategory)
+          }
+          data = { list: this.currentCategory.list }
         } else {
+          data = { [field]: val }
           this.currentCategory[field] = val
         }
-        db.updateTodo(this.currentCategory)
+        // console.log(data)
+        const loading = hasLoading && this.$loading()
+        return db.updateTodo(data, this.currentCategory.objectId).then(res => {
+          hasLoading && loading.close()
+          return res
+        })
       },
       // 删除清单
       deleteCategory() {
@@ -463,9 +493,9 @@
           db.deleteList(this.activeCategoryId).then(index => {
             this.todoList.splice(index, 1)
             if (this.todoList.length) {
-              const { list, id } = this.todoList[0]
-              this.activeCategoryId = id
-              this.activeListId = list && list[0] ? list[0].id : 0
+              this.activeCategoryId = this.todoList[0].objectId
+              // this.activeListId = list && list[0] ? list[0].id : 0
+              this.setActiveListId()
             }
             this.cancelForm()
           })
@@ -474,43 +504,57 @@
       // 添加任务
       addListToCategory() {
         if (this.newListName.trim()) {
-          db.addSubList(this.activeCategoryId, { name: this.newListName }).then(res => {
-            this.$set(this.todoList, res.index, res.item)
-            this.activeListId = this.todoList[0].list[0].id
+          const data = { id: Date.now(), name: this.newListName }
+          this.updateCategory('list', data, false).then(() => {
             this.newListName = ''
           })
         }
       },
       // 修改任务内容
       updateList(val, field = 'content') {
+        if (this.timer) {
+          clearTimeout(this.timer)
+        }
+        const common = () => {
+          this.autoSave = 1
+          this.updateCategory('list', {
+            ...this.currentList,
+            [field]: val
+          }, false).then(() => {
+            this.autoSave = 2
+          })
+        }
         if (field === 'name' && val === '') {
           setTimeout(() => {
-            this.updateList(true, 'isNameEmpty')
-          }, 300)
+            clearTimeout(this.timer)
+            this.currentList.isNameEmpty = true
+            common()
+          }, 200)
         }
-        db.updateSubList(this.activeCategoryId, {
-          ...this.currentList,
-          [field]: val
-        }).then(res => {
-          this.$set(this.todoList, res.index, res.item)
-        })
+        this.autoSave = 0
+        this.timer = setTimeout(common, 3000)
       },
       // 删除任务
       deleteListName() {
         if (this.currentList.isNameEmpty) {
           // 此时需要删除任务
-          db.deleteSubList(this.activeCategoryId, this.currentList).then(res => {
-            this.todoList[res.itemIndex].list.splice(res.listIndex, 1)
-            if (this.todoList[0].list.length) {
-              this.activeListId = this.todoList[0].list[0].id
-              this.$refs[`list-${this.activeListId}`][0].$refs.input.focus()
-            }
+          const itemIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
+          const listIndex = this.currentCategory.list.findIndex(x => x.id === this.currentList.id)
+          this.todoList[itemIndex].list.splice(listIndex, 1)
+          db.updateTodo({ list: this.currentCategory.list }, this.currentCategory.objectId).then(() => {
+            console.log('删除成功')
           })
         }
       },
       selectCategory(item) {
-        this.activeCategoryId = item.id
-        this.activeListId = item.list && item.list[0] ? item.list[0].id : 0
+        this.activeCategoryId = item.objectId
+        this.setActiveListId()
+      },
+      setActiveListId() {
+        this.$nextTick(() => {
+          const { complete, unComplete } = this.currentCategoryList
+          this.activeListId = unComplete[0] ? unComplete[0].id : complete[0] && complete[0].id
+        })
       }
     },
     template: document.getElementById('app-tpl').innerHTML
@@ -550,6 +594,7 @@
       }
     },
     created() {
+      db.syncLocal()
       this.currentUser = db.getCurrentUser()
       if (this.currentUser) {
         this.hasLogin = true
@@ -574,10 +619,11 @@
         this.$refs['ruleForm'].resetFields()
       },
       handleLogin() {
+        const loading = this.$loading()
         db.login(this.formLabelAlign).then(() => {
-          // this.$router.replace('/')
           location.reload()
         }).catch(e => {
+          loading.close()
           this.$message({
             message: e.msg,
             type: 'error'
@@ -590,13 +636,16 @@
         })
       },
       handleRegister() {
+        const loading = this.$loading()
         db.register(this.formLabelAlign).then(res => {
           this.$message({
             message: res.msg,
             type: 'success'
           })
+          loading.close()
           history.back()
         }).catch(e => {
+          loading.close()
           this.$message({
             message: e.msg,
             type: 'error'
