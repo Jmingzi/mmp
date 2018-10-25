@@ -264,11 +264,10 @@
     },
     methods: {
       updateCheckbox(val) {
-        const data = {
+        this.$parent.updateCategory('list', {
           ...this.item,
           isComplete: val
-        }
-        this.$parent.updateCategory('list', data)
+        }, false)
       },
       updateListName(e) {
         this.inputValue = e.target.value
@@ -337,7 +336,7 @@
         if (this.currentCategory.list) {
           this.currentCategory.list.forEach(x => {
             if (x.isComplete) {
-              complete.unshift(x)
+              complete.push(x)
             } else {
               unComplete.push(x)
             }
@@ -423,8 +422,8 @@
       submitForm() {
         this.$refs['addForm'].validate((valid) => {
           if (valid) {
+            const loading = this.$loading()
             if (this.currentEditItem) {
-              const loading = this.$loading()
               db.updateTodo(this.form, this.currentEditItem.objectId).then(result => {
                 loading.close()
                 const index = this.todoList.findIndex(x => x.objectId === this.currentEditItem.objectId)
@@ -436,15 +435,22 @@
                 this.cancelForm()
               })
             } else {
-              db.addTodo(this.form, this.currentUser).then(res => {
+              const user = db.getCurrentUser()
+              const reqData = {
+                ...this.form,
+                userId: user.objectId,
+                userName: user.username
+              }
+              db.addTodo(reqData).then(res => {
                 loading.close()
+                this.cancelForm()
                 this.$message({
                   message: '添加成功',
                   type: 'success'
                 })
-                this.todoList.unshift(res)
+                reqData.objectId = res.objectId
+                this.todoList.unshift(reqData)
                 this.activeCategoryId = res.objectId
-                this.cancelForm()
               })
             }
           } else {

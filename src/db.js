@@ -71,15 +71,9 @@ const db = {
 
   // 添加清单
   addTodo(data) {
-    const user = this.getCurrentUser()
     const todoSync = new TodoList()
-    const reqData = {
-      ...data,
-      userId: user.objectId,
-      userName: user.username
-    }
-    Object.keys(reqData).forEach(key => {
-      todoSync.set(key, reqData[key])
+    Object.keys(data).forEach(key => {
+      todoSync.set(key, data[key])
     })
     return todoSync.save().then(res => {
       // console.log(res.toJSON())
