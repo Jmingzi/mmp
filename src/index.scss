@@ -39,10 +39,12 @@ div {
     }
   }
   &__add {
-    padding: 0 25px 10px 25px;
+    margin: 0 15px 0 20px;
     cursor: pointer;
     font-size: 14px;
-    i {
+    padding: 0 0 10px 5px;
+    border-bottom: 1px #e4e7ed solid;
+  i {
       //color: #999999;
     }
   }
@@ -166,7 +168,7 @@ div {
     display: flex;
     align-items: center;
     border-radius: 5px;
-    cursor: pointer;
+    // cursor: pointer;
     padding: 0 20px 0 0;
     &--active {
       background-color: rgba(#99CCFF, .2);

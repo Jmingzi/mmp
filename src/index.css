@@ -34,9 +34,11 @@ div {
   .todo__wrap .el-radio:nth-of-type(6n) {
     margin-left: 0; }
 .todo__add {
-  padding: 0 25px 10px 25px;
+  margin: 0 15px 0 20px;
   cursor: pointer;
-  font-size: 14px; }
+  font-size: 14px;
+  padding: 0 0 10px 5px;
+  border-bottom: 1px #e4e7ed solid; }
 .todo__empty--data {
   font-size: 16px;
   color: #999999;
@@ -125,7 +127,6 @@ div {
     display: flex;
     align-items: center;
     border-radius: 5px;
-    cursor: pointer;
     padding: 0 20px 0 0; }
     .category-item__content--active {
       background-color: rgba(153, 204, 255, 0.2); }

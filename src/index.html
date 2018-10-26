@@ -21,6 +21,7 @@
 <script src="nw.config.js"></script>
 <script src="cache.js"></script>
 <script src="db.js"></script>
+<script src="../node_modules/awe-dnd/vue-dragging.es5.js"></script>
 <script id="app-tpl" type="text/html">
     <div class="todo__wrap">
         <p class="auto-save">
@@ -49,6 +50,7 @@
                             <i class="el-icon-plus"></i>
                             <span>添加清单</span>
                         </div>
+                        <!--v-dragging="{ item, list: todoList, group: 'list' }"-->
                         <category-item
                             v-for="item in todoList"
                             :key="item.objectId"
@@ -163,18 +165,21 @@
                 'category-item__content--active': activeId === item[hasCheckbox ? 'id' : 'objectId']
             }"
         >
-            <div
-                v-if="item[hasCheckbox ? 'id' : 'objectId'] === activeId || !hasCheckbox"
-                class="category-item__drag"
-            >
-                <i class="el-icon-sort"></i>
-            </div>
-            <div
-                v-else
-                class="category-item__empty"
-            >
-                <i class="el-icon-sort"></i>
-            </div>
+            <template v-if="false">
+                <div
+                    v-if="item[hasCheckbox ? 'id' : 'objectId'] === activeId || !hasCheckbox"
+                    class="category-item__drag"
+                >
+                    <i class="el-icon-sort"></i>
+                </div>
+                <div
+                    v-else
+                    class="category-item__empty"
+                >
+                    <i class="el-icon-sort"></i>
+                </div>
+            </template>
+            <div v-else :style="{ height: '40px', width: hasCheckbox ? '22px' : '10px' }"></div>
             <div
                 class="category-item__word"
                 :class="{ 'category-item__word-border': hasCheckbox }"
@@ -250,6 +255,7 @@
     </div>
 </script>
 <script>
+  Vue.use(VueDragging)
   Vue.component('category-item', {
     data() {
       return {
@@ -361,6 +367,14 @@
       window.addEventListener('resize', () => {
         this.setAppColumWidth(leftWidth)
       })
+      // this.$dragging.$on('dragged', ({ value }) => {
+      //   console.log(value.item)
+      //   console.log(value.list)
+      //   console.log(value.otherData)
+      // })
+      // this.$dragging.$on('dragend', (data) => {
+      //   console.log(data)
+      // })
     },
     methods: {
       setAppColumWidth(leftWidth) {
