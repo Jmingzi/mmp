@@ -510,9 +510,8 @@
       addListToCategory() {
         if (this.newListName.trim()) {
           const data = { id: Date.now(), name: this.newListName }
-          this.updateCategory('list', data, false).then(() => {
-            this.newListName = ''
-          })
+          this.newListName = ''
+          this.updateCategory('list', data, false)
         }
       },
       // 修改任务内容

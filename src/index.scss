@@ -10,6 +10,9 @@ body {
 div {
   box-sizing: border-box;
 }
+::-webkit-scrollbar {
+  width: 0;
+}
 .auto-save {
   position: fixed;
   right: 20px;
@@ -142,6 +145,7 @@ div {
       height: 100%;
       background-color: #fff;
       border-radius: 5px;
+      overflow: auto;
     }
   }
   &__color-demo {
