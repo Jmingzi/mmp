@@ -21,6 +21,9 @@
 <script src="nw.config.js"></script>
 <script src="cache.js"></script>
 <script src="db.js"></script>
+<script src="lib/drag/utils.js"></script>
+<script src="lib/drag/drag.js"></script>
+<script src="lib/drag/index.js"></script>
 <!--<script src="../node_modules/awe-dnd/vue-dragging.es5.js"></script>-->
 <script id="app-tpl" type="text/html">
     <div class="todo__wrap">
@@ -51,15 +54,18 @@
                             <span>添加清单</span>
                         </div>
                         <!--v-dragging="{ item, list: todoList, group: 'list' }"-->
-                        <category-item
-                            v-for="item in todoList"
-                            :key="item.objectId"
-                            :item="item"
-                            :active-id="activeCategoryId"
-                            @click.native="selectCategory(item)"
-                            @contextmenu.native.prevent="e => toEditTodo(e, item)"
-                        >
-                        </category-item>
+                        <div class="todo__cate">
+                            <category-item
+                                v-for="(item, index) in todoList"
+                                :key="item.objectId"
+                                :item="item"
+                                :data-index="index"
+                                :active-id="activeCategoryId"
+                                @click.native="selectCategory(item)"
+                                @contextmenu.native.prevent="e => toEditTodo(e, item)"
+                            >
+                            </category-item>
+                        </div>
                     </template>
 
                 </el-tab-pane>
@@ -77,16 +83,19 @@
                     >
                     </el-input>
                 </div>
-                <category-item
-                    v-for="item in currentCategoryList.unComplete"
-                    :ref="`list-${item.id}`"
-                    :key="item.id"
-                    :item="{ ...item, color: currentCategory.color }"
-                    :active-id="activeListId"
-                    has-checkbox
-                    @click.native="activeListId = item.id"
-                >
-                </category-item>
+                <div class="todo__list--unComplete">
+                    <category-item
+                        v-for="(item, i) in currentCategoryList.unComplete"
+                        :ref="`list-${item.id}`"
+                        :key="item.id"
+                        :item="{ ...item, color: currentCategory.color }"
+                        :active-id="activeListId"
+                        :data-index="i"
+                        has-checkbox
+                        @click.native="activeListId = item.id"
+                    >
+                    </category-item>
+                </div>
                 <div class="todo__list--complete" v-show="currentCategoryList.complete.length">
                     <div class="todo__list--complete-title" @click="toggleSpreadComplete">
                         <span>
@@ -95,7 +104,7 @@
                         </span>
                         <span v-if="!isSpreadComplete">{{ currentCategoryList.complete.length }}</span>
                     </div>
-                    <div v-show="isSpreadComplete">
+                    <div class="todo__list--complete-wrap" v-show="isSpreadComplete">
                         <category-item
                             v-for="item in currentCategoryList.complete"
                             :ref="`list-${item.id}`"
@@ -158,7 +167,7 @@
     </div>
 </script>
 <script type="text/html" id="category-tpl">
-    <div class="category-item" :style="{ borderColor: item.color }">
+    <div class="category-item" :style="{ borderColor: item.color }" :data-index="dataIndex">
         <div
             class="category-item__content"
             :class="{
@@ -193,6 +202,7 @@
                     </el-checkbox>
                     <input
                         type="text"
+                        class="input"
                         ref="input"
                         :value="inputValue !== undefined ? inputValue : item.name"
                         placeholder="请输入任务名称"
@@ -268,6 +278,10 @@
       hasCheckbox: {
         type: Boolean,
         default: false
+      },
+      dataIndex: {
+        type: Number,
+        default: 0
       }
     },
     methods: {
@@ -429,6 +443,23 @@
             this.activeCategoryId = res[0].objectId
             this.setActiveListId()
           }
+          // 初始化拖拽
+          const drag = new Drag({
+            selector: '.category-item',
+            forbiddenSelector: '.input',
+            downCallBack(elem) {
+              beforeAdd()
+            },
+            moveCallBack(elem, { x, y }, originNode) {
+              elem.classList.add('dragging')
+              addTargetLine(x, y, originNode)
+            },
+            upCallBack(elem) {
+              elem.classList.remove('dragging')
+              removeTargetLine()
+              updateSort(elem)
+            }
+          })
         })
       },
       // 添加清单
