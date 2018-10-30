@@ -53,13 +53,12 @@
                             <i class="el-icon-plus"></i>
                             <span>添加清单</span>
                         </div>
-                        <!--v-dragging="{ item, list: todoList, group: 'list' }"-->
                         <div class="todo__cate">
                             <category-item
-                                v-for="(item, index) in todoList"
+                                v-for="(item, i) in todoList"
                                 :key="item.objectId"
                                 :item="item"
-                                :data-index="index"
+                                :data-index="i"
                                 :active-id="activeCategoryId"
                                 @click.native="selectCategory(item)"
                                 @contextmenu.native.prevent="e => toEditTodo(e, item)"
@@ -92,7 +91,7 @@
                         :active-id="activeListId"
                         :data-index="i"
                         has-checkbox
-                        @click.native="activeListId = item.id"
+                        @click.native="selectList(item)"
                     >
                     </category-item>
                 </div>
@@ -106,13 +105,14 @@
                     </div>
                     <div class="todo__list--complete-wrap" v-show="isSpreadComplete">
                         <category-item
-                            v-for="item in currentCategoryList.complete"
+                            v-for="(item, i) in currentCategoryList.complete"
                             :ref="`list-${item.id}`"
                             :key="item.id"
                             :item="{ ...item, color: currentCategory.color }"
                             :active-id="activeListId"
+                            :data-index="i"
                             has-checkbox
-                            @click.native="activeListId = item.id"
+                            @click.native="selectList(item)"
                         >
                         </category-item>
                     </div>
@@ -315,8 +315,7 @@
         spreadCompleteMap: {},
         form: {
           name: '',
-          color: '',
-          // sort: 1
+          color: ''
         },
         rules: {
           name: [
@@ -337,7 +336,8 @@
           { id: 9, value: '#CCCCCC' }
         ],
         currentEditItem: null,
-        timer: null
+        timer: null,
+        sortMap: {}
       }
     },
     computed: {
@@ -353,16 +353,18 @@
       },
       // 当前任务列表 分为已完成 未完成
       currentCategoryList() {
-        const complete = []
-        const unComplete = []
+        let complete = []
+        let unComplete = []
         if (this.currentCategory.list) {
-          this.currentCategory.list.forEach(x => {
-            if (x.isComplete) {
-              complete.push(x)
-            } else {
-              unComplete.push(x)
-            }
-          })
+          // this.currentCategory.list.forEach(x => {
+          //   if (x.isComplete) {
+          //     complete.push(x)
+          //   } else {
+          //     unComplete.push(x)
+          //   }
+          // })
+          complete = this.currentCategory.list.filter(x => x.isComplete)
+          unComplete = this.currentCategory.list.filter(x => !x.isComplete)
         }
         return { complete, unComplete }
       },
@@ -372,7 +374,7 @@
       }
     },
     created() {
-      this.getCategory()
+      this.init()
     },
     mounted() {
       const leftWidth = document.querySelector('.todo__category').getBoundingClientRect().width
@@ -381,14 +383,6 @@
       window.addEventListener('resize', () => {
         this.setAppColumWidth(leftWidth)
       })
-      // this.$dragging.$on('dragged', ({ value }) => {
-      //   console.log(value.item)
-      //   console.log(value.list)
-      //   console.log(value.otherData)
-      // })
-      // this.$dragging.$on('dragend', (data) => {
-      //   console.log(data)
-      // })
     },
     methods: {
       setAppColumWidth(leftWidth) {
@@ -433,14 +427,18 @@
           this.selectCategory(item)
         }
       },
-      // 获取所有的清单
-      getCategory() {
+      init() {
         const loading = this.$loading()
-        db.getTodoList().then(res => {
+        Promise.all([db.getTodoList(), db.getSortById(0)]).then(res => {
           loading.close()
-          this.todoList = res
-          if (res.length) {
-            this.activeCategoryId = res[0].objectId
+          if (res[1]) {
+            this.sortMap[res[1].pid] = res[1]
+            this.sortList(res[1].list, res[0])
+          } else {
+            this.todoList = res
+          }
+          if (this.todoList.length) {
+            this.activeCategoryId = this.todoList[0].objectId
             this.setActiveListId()
           }
           // 初始化拖拽
@@ -454,13 +452,74 @@
               elem.classList.add('dragging')
               addTargetLine(x, y, originNode)
             },
-            upCallBack(elem) {
+            upCallBack: (elem) => {
               elem.classList.remove('dragging')
               removeTargetLine()
-              updateSort(elem)
+              const result = updateSort(elem)
+              if (result) {
+                // 对比排序是否发生变化
+                let isChange = false
+                for (let i = 0; i < result.sort.length; i++) {
+                  if (result.sort[i] > result.sort[(i + 1) === result.sort.length ? result.sort.length - 1 : (i + 1)]) {
+                    isChange = true
+                  }
+                }
+                console.log('isChange', isChange)
+                isChange && this.resort(result)
+              }
             }
           })
         })
+      },
+      // 根据排序数组给清单排序
+      sortList(sortList, list) {
+        this.todoList = sortList.map(objectId => {
+          return list.find(item => item.objectId === objectId)
+        })
+      },
+      // 重新排序清单 或 任务
+      resort(result) {
+        const { container, sort } = result
+        const userId = this.currentUser.objectId
+        const loading = this.$loading()
+        if (container.classList.contains('todo__cate')) {
+          const finalSort = sort.map(i => this.todoList[i].objectId)
+          if (this.sortMap[userId]) {
+            // update
+            return db.updateSortById(this.sortMap[userId].objectId, { list: finalSort }).then(() => {
+              loading.close()
+              this.sortList(finalSort, this.todoList)
+            })
+          } else {
+            // save
+            return db.saveSortById({
+              type: 'root',
+              list: finalSort,
+              pid: userId
+            }).then(() => {
+              loading.close()
+              this.sortList(finalSort, this.todoList)
+            })
+          }
+        } else {
+          const isUn = container.classList.contains('todo__list--unComplete')
+          const { complete, unComplete } = this.currentCategoryList
+          const { objectId } = this.currentCategory
+          const final = sort.map(i => isUn ? unComplete[i] : complete[i])
+          const index = this.todoList.findIndex(x => x.objectId === objectId)
+          const data = {
+            list: isUn ? final.concat(complete) : [].concat(unComplete, final)
+          }
+          db.updateTodo(data, objectId).then(() => {
+            this.todoList[index].list = data.list
+            const temp = this.todoList
+            this.todoList = []
+            this.$nextTick(() => {
+              this.todoList = temp
+            })
+            loading.close()
+          })
+        }
       },
       // 添加清单
       submitForm() {
@@ -563,6 +622,7 @@
       updateList(val, field = 'content') {
         if (this.timer) {
           clearTimeout(this.timer)
+          this.timer = null
         }
         const common = () => {
           this.autoSave = 1
@@ -571,17 +631,19 @@
             [field]: val
           }, false).then(() => {
             this.autoSave = 2
+            this.timer = null
           })
         }
         if (field === 'name' && val === '') {
           setTimeout(() => {
             clearTimeout(this.timer)
+            this.timer = null
             this.currentList.isNameEmpty = true
             common()
           }, 200)
         }
         this.autoSave = 0
-        this.timer = setTimeout(common, 10 * 1000)
+        this.timer = setTimeout(common, 5 * 1000)
       },
       // 删除任务
       deleteListName() {
@@ -596,8 +658,23 @@
         }
       },
       selectCategory(item) {
-        this.activeCategoryId = item.objectId
-        this.setActiveListId()
+        this.beforeSelect().then(() => {
+          this.activeCategoryId = item.objectId
+          this.setActiveListId()
+        })
+      },
+      async selectList(item) {
+        await this.beforeSelect()
+        this.activeListId = item.id
+      },
+      beforeSelect() {
+        if (this.timer) {
+          this.$message({
+            message: '请等待保存完成'
+          })
+          return Promise.reject()
+        }
+        return Promise.resolve()
       },
       setActiveListId() {
         this.$nextTick(() => {

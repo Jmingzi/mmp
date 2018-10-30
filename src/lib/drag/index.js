@@ -65,5 +65,12 @@ function getBoxArea(x, y) {
 }
 
 function updateSort(elem) {
-  insert(elem)
+  if (listWrapElem && listOldElemChilds) {
+    insert(elem)
+    return {
+      container: listWrapElem,
+      sort: Array.from(listWrapElem.childNodes).map(x => x.dataset.index)
+    }
+  }
+  return null
 }
