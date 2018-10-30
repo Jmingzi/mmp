@@ -356,13 +356,6 @@
         let complete = []
         let unComplete = []
         if (this.currentCategory.list) {
-          // this.currentCategory.list.forEach(x => {
-          //   if (x.isComplete) {
-          //     complete.push(x)
-          //   } else {
-          //     unComplete.push(x)
-          //   }
-          // })
           complete = this.currentCategory.list.filter(x => x.isComplete)
           unComplete = this.currentCategory.list.filter(x => !x.isComplete)
         }
@@ -435,7 +428,7 @@
             this.sortMap[res[1].pid] = res[1]
             this.sortList(res[1].list, res[0])
           } else {
-            this.todoList = res
+            this.todoList = res[0]
           }
           if (this.todoList.length) {
             this.activeCategoryId = this.todoList[0].objectId
