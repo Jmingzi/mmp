@@ -156,6 +156,12 @@ const db = {
         data.cb(e.percent)
       }
     })
+  },
+
+  deleteImg(objectId) {
+    return AV.File.createWithoutData(objectId).destroy().then(res => {
+      console.log(res)
+    })
   }
 }
 

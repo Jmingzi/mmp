@@ -127,15 +127,6 @@
                         <h2>{{ currentList.name }}</h2>
                     </div>
                     <div class="todo__content--area">
-                        <!--<el-input-->
-                                <!--v-if="false"-->
-                            <!--type="textarea"-->
-                            <!--placeholder="请输入内容"-->
-                            <!--:value="currentList.content"-->
-                            <!--:autosize="{ minRows: 15 }"-->
-                            <!--@input="updateList"-->
-                        <!--&gt;-->
-                        <!--</el-input>-->
                         <textarea
                             placeholder="请输入内容"
                             :value="currentList.content"
@@ -149,18 +140,18 @@
                         <div class="asserts">
                             <p>附件列表 <span class="tips">(数量限制为3张)</span></p>
                             <div
-                                v-for="(url, i) in (currentCategory.asserts || [])"
-                                :key="url"
+                                v-for="item in currentListAsserts"
+                                :key="item.id"
                                 class="img"
                             >
-                                <img title="查看大图" :src="`${url}?imageView2/0/w/100/h/100`" @click="lookBig(url)">
-                                <div class="asserts-delete" @click.stop="deleteAsserts(i)">
+                                <img title="查看大图" :src="`${item.url}?imageView2/0/w/100/h/100`" @click="lookBig(item.url)">
+                                <div class="asserts-delete" @click.stop="deleteAsserts(item)">
                                     <i class="el-icon-delete"></i>
                                 </div>
                             </div>
                             <p
                                 class="tips"
-                                v-if="!currentCategory.asserts || !currentCategory.asserts.length"
+                                v-if="!currentListAsserts.length"
                             >
                                 <i class="el-icon-upload"></i> 还没有附件呢，截图并粘贴到输入框即可上传添加附件哦
                             </p>
@@ -393,7 +384,11 @@
       },
       // 是否显示 当前清单的已完成列表
       isSpreadComplete() {
-        return this.spreadCompleteMap[this.activeCategoryId] !== false
+        return this.spreadCompleteMap[this.activeCategoryId] === true
+      },
+      currentListAsserts() {
+        const { asserts } = this.currentCategory
+        return asserts ? asserts.filter(x => x.pid === this.currentList.id) : []
       }
     },
     created() {
@@ -710,8 +705,8 @@
       },
       paste(e) {
         // 判断张数
-        const { asserts } = this.currentCategory
-        if (asserts && asserts.length === 3) {
+        // const { asserts } = this.currentCategory
+        if (this.currentListAsserts.length === 3) {
           this.$message.error('最多只能上传3张！')
           return
         }
@@ -732,28 +727,33 @@
         }
       },
       upload(base64) {
-        // let name = title || 'jmingzi'
         const loading = this.$loading()
         db.uploadImg({
-          name: `img-${Date.now()}`,
+          name: `todo-img-${Date.now()}`,
           base64: base64.split(';')[1],
           cb: num => {
-            // this.showProgress = true
             // this.uploadProgress = num
           }
         }).then(res => {
           loading.close()
-          const val = (this.currentCategory.asserts || []).concat(res.toJSON().url)
+          const val = (this.currentCategory.asserts || []).concat({
+            pid: this.currentList.id,
+            ...res.toJSON()
+          })
           this.updateCategory('asserts', val)
         })
       },
       lookBig(url) {
         window.open(url)
       },
-      deleteAsserts(i) {
+      deleteAsserts(item) {
         this.$confirm('确定要删除附件吗？').then(() => {
-          this.currentCategory.asserts.splice(i, 1)
-          this.updateCategory('asserts', this.currentCategory.asserts)
+          db.deleteImg(item.objectId).then(() => {
+            const { asserts } = this.currentCategory
+            const i = asserts.findIndex(x => x.objectId === item.objectId)
+            asserts.splice(i, 1)
+            this.updateCategory('asserts', asserts)
+          })
         })
       }
     },
