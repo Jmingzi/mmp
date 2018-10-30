@@ -1,3 +1,4 @@
+@charset "UTF-8";
 html, body, #app {
   height: 100%; }
 
@@ -5,7 +6,8 @@ body {
   margin: 0;
   padding: 0;
   background: #f2f2f2;
-  font-size: 12px; }
+  font-size: 12px;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif; }
 
 div {
   box-sizing: border-box; }
@@ -116,6 +118,18 @@ div {
     margin-top: -6px; }
     .todo__content--area .el-textarea__inner {
       border: none; }
+  .todo__content textarea {
+    display: block;
+    width: 98%;
+    min-height: 300px;
+    border: none;
+    -webkit-appearance: none;
+    margin: 0 auto;
+    padding: 0 15px;
+    font-size: 14px;
+    color: #666; }
+    .todo__content textarea:focus {
+      outline: none; }
 .todo__list, .todo__content {
   height: 100%; }
   .todo__list--wrap, .todo__content--wrap {
@@ -188,5 +202,31 @@ div {
     text-align: center; }
   .login__form .bottom-info {
     text-align: center; }
+
+.asserts {
+  padding: 10px 15px;
+  font-size: 12px;
+  border-top: 1px #f2f2f2 solid; }
+  .asserts .tips {
+    color: #aaa; }
+  .asserts .img {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    border: 1px #cecece solid;
+    margin-right: 10px; }
+  .asserts .asserts-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    color: red; }
+    .asserts .asserts-delete i {
+      font-size: 16px; }
+  .asserts img {
+    max-width: 100px;
+    max-height: 100px;
+    cursor: pointer; }
 
 /*# sourceMappingURL=index.css.map */

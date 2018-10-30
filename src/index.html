@@ -128,6 +128,7 @@
                     </div>
                     <div class="todo__content--area">
                         <el-input
+                                v-if="false"
                             type="textarea"
                             placeholder="请输入内容"
                             :value="currentList.content"
@@ -135,6 +136,32 @@
                             @input="updateList"
                         >
                         </el-input>
+                        <textarea
+                            placeholder="请输入内容"
+                            :value="currentList.content"
+                            @input="updateList"
+                            @paste="paste"
+                        >
+                        </textarea>
+                        <div class="asserts">
+                            <p>附件列表 <span class="tips">(数量限制为3张)</span></p>
+                            <div
+                                v-for="(url, i) in (currentCategory.asserts || [])"
+                                :key="url"
+                                class="img"
+                            >
+                                <img title="查看大图" :src="`${url}?imageView2/0/w/100/h/100`" @click="lookBig(url)">
+                                <div class="asserts-delete" @click.stop="deleteAsserts(i)">
+                                    <i class="el-icon-delete"></i>
+                                </div>
+                            </div>
+                            <p
+                                class="tips"
+                                v-if="!currentCategory.asserts || !currentCategory.asserts.length"
+                            >
+                                <i class="el-icon-upload"></i> 还没有附件呢，截图并粘贴到输入框即可上传添加附件哦
+                            </p>
+                        </div>
                     </div>
                 </template>
                 <p v-else class="todo__empty--data">点击任务列表查看详情</p>
@@ -562,6 +589,7 @@
       // 修改清单内容
       updateCategory(field, val, hasLoading = true) {
         let data
+        const itemIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
         if (field === 'list') {
           if (!this.currentCategory.list) {
             this.currentCategory.list = []
@@ -574,13 +602,13 @@
             // 处理新增任务
             this.activeListId = val.id
             this.currentCategory.list.unshift(val)
-            const itemIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
             this.$set(this.todoList, itemIndex, this.currentCategory)
           }
           data = { list: this.currentCategory.list }
         } else {
           data = { [field]: val }
           this.currentCategory[field] = val
+          this.$set(this.todoList, itemIndex, this.currentCategory)
         }
         // console.log(data)
         const loading = hasLoading && this.$loading()
@@ -612,7 +640,8 @@
         }
       },
       // 修改任务内容
-      updateList(val, field = 'content') {
+      updateList(e, field = 'content') {
+        const val = e.target.value.trim()
         if (this.timer) {
           clearTimeout(this.timer)
           this.timer = null
@@ -673,6 +702,54 @@
         this.$nextTick(() => {
           const { complete, unComplete } = this.currentCategoryList
           this.activeListId = unComplete[0] ? unComplete[0].id : complete[0] && complete[0].id
+        })
+      },
+      paste(e) {
+        // 判断张数
+        const { asserts } = this.currentCategory
+        if (asserts && asserts.length === 3) {
+          this.$message.error('最多只能上传3张！')
+          return
+        }
+        const pasteItem = e.clipboardData.items[0]
+        if (pasteItem && /image/.test(pasteItem.type)) {
+          e.preventDefault()
+          const blob = pasteItem.getAsFile()
+          const rdr = new FileReader()
+          rdr.onloadend = () => {
+            this.upload(rdr.result)
+          }
+          rdr.readAsDataURL(blob)
+        } else {
+          // pasteItem.getAsString(content => {
+          //   console.log(content)
+          //   this.$message.info('复制的是字符串')
+          // })
+        }
+      },
+      upload(base64) {
+        // let name = title || 'jmingzi'
+        const loading = this.$loading()
+        db.uploadImg({
+          name: `img-${Date.now()}`,
+          base64: base64.split(';')[1],
+          cb: num => {
+            // this.showProgress = true
+            // this.uploadProgress = num
+          }
+        }).then(res => {
+          loading.close()
+          const val = (this.currentCategory.asserts || []).concat(res.toJSON().url)
+          this.updateCategory('asserts', val)
+        })
+      },
+      lookBig(url) {
+        window.open(url)
+      },
+      deleteAsserts(i) {
+        this.$confirm('确定要删除附件吗？').then(() => {
+          this.currentCategory.asserts.splice(i, 1)
+          this.updateCategory('asserts', this.currentCategory.asserts)
         })
       }
     },

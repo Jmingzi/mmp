@@ -148,6 +148,14 @@ const db = {
       sort.set(key, data[key])
     })
     return sort.save()
+  },
+
+  uploadImg(data) {
+    return new AV.File(data.name, data).save({
+      onprogress(e) {
+        data.cb(e.percent)
+      }
+    })
   }
 }
 

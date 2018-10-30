@@ -1,3 +1,4 @@
+@charset "utf-8";
 html, body, #app {
   height: 100%;
 }
@@ -6,6 +7,7 @@ body {
   padding: 0;
   background: #f2f2f2;
   font-size: 12px;
+  font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
 }
 div {
   box-sizing: border-box;
@@ -152,6 +154,20 @@ div {
         border: none;
       }
     }
+    textarea {
+      display: block;
+      width: 98%;
+      min-height: 300px;
+      border: none;
+      -webkit-appearance: none;
+      margin: 0 auto;
+      padding: 0 15px;
+      font-size: 14px;
+      color: #666;
+      &:focus {
+        outline: none;
+      }
+    }
   }
   &__list,
   &__content {
@@ -181,7 +197,6 @@ div {
     display: flex;
     align-items: center;
     border-radius: 5px;
-    // cursor: pointer;
     padding: 0 20px 0 0;
     &--active {
       background-color: rgba(#99CCFF, .2);
@@ -239,12 +254,43 @@ div {
     border-radius: 5px;
     h1 {
       margin-bottom: 20px;
-      //padding-left: 80px;
       font-size: 20px;
       text-align: center;
     }
     .bottom-info {
       text-align: center;
     }
+  }
+}
+
+.asserts {
+  padding: 10px 15px;
+  font-size: 12px;
+  border-top: 1px #f2f2f2 solid;
+  .tips {
+    color: #aaa;
+  }
+  .img {
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    border: 1px #cecece solid;
+    margin-right: 10px;
+  }
+  .asserts-delete {
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    color: red;
+    i {
+      font-size: 16px;
+    }
+  }
+  img {
+    max-width: 100px;
+    max-height: 100px;
+    cursor: pointer;
   }
 }
