@@ -127,20 +127,23 @@
                         <h2>{{ currentList.name }}</h2>
                     </div>
                     <div class="todo__content--area">
-                        <el-input
-                                v-if="false"
-                            type="textarea"
-                            placeholder="请输入内容"
-                            :value="currentList.content"
-                            :autosize="{ minRows: 15 }"
-                            @input="updateList"
-                        >
-                        </el-input>
+                        <!--<el-input-->
+                                <!--v-if="false"-->
+                            <!--type="textarea"-->
+                            <!--placeholder="请输入内容"-->
+                            <!--:value="currentList.content"-->
+                            <!--:autosize="{ minRows: 15 }"-->
+                            <!--@input="updateList"-->
+                        <!--&gt;-->
+                        <!--</el-input>-->
                         <textarea
                             placeholder="请输入内容"
                             :value="currentList.content"
                             @input="updateList"
                             @paste="paste"
+                            :style="{
+                                height: `${appColumWidth.contentHeight - 230}px`
+                            }"
                         >
                         </textarea>
                         <div class="asserts">
@@ -330,7 +333,7 @@
     data() {
       return {
         currentUser: db.getCurrentUser(),
-        appColumWidth: { width: 0 },
+        appColumWidth: { width: 0, contentHeight: 0 },
         activeTabName: 'first',
         todoList: [],
         activeCategoryId: 0,
@@ -407,6 +410,7 @@
     methods: {
       setAppColumWidth(leftWidth) {
         this.appColumWidth.width = `${(document.body.offsetWidth - leftWidth) / 2}px`
+        this.appColumWidth.contentHeight = document.body.offsetHeight - 30 // 30 为上下边距
       },
       toggleSpreadComplete() {
         this.$set(this.spreadCompleteMap, this.activeCategoryId, !this.isSpreadComplete)
