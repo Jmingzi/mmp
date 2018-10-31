@@ -492,9 +492,11 @@
       },
       // 根据排序数组给清单排序
       sortList(sortList, list) {
-        this.todoList = sortList.map(objectId => {
+        const isExist = sortList.map(objectId => {
           return list.find(item => item.objectId === objectId)
         })
+        const newLest = list.filter(item => sortList.every(objectId => objectId !== item.objectId))
+        this.todoList = [].concat(newLest, isExist)
       },
       // 重新排序清单 或 任务
       resort(result) {
