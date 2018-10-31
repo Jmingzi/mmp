@@ -314,7 +314,7 @@
       },
       updateListName(e) {
         this.inputValue = e.target.value
-        this.$parent.updateList(e.target.value, 'name')
+        this.$parent.updateList(e, 'name')
       }
     },
     template: document.getElementById('category-tpl').innerHTML
