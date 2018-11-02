@@ -162,6 +162,14 @@ const db = {
     return AV.File.createWithoutData(objectId).destroy().then(res => {
       console.log(res)
     })
+  },
+
+  resetPwd() {
+    if (window.email) {
+      return AV.User.requestPasswordReset(window.email)
+    } else {
+      return Promise.reject('邮箱为空')
+    }
   }
 }
 

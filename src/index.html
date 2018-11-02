@@ -278,7 +278,10 @@
                     </el-form-item>
                 </el-form>
                 <div class="bottom-info">
-                    <router-link v-if="isLogin" to="/login?register=1">没有账号，去注册</router-link>
+                    <template v-if="isLogin">
+                        <router-link to="/login?register=1">没有账号，去注册</router-link>
+                        <a v-if="false" href="javascript:" @click="resetPwd">忘记密码？点击发送邮件</a>
+                    </template>
                     <router-link v-else to="/login">去登录</router-link>
                 </div>
             </template>
@@ -496,7 +499,7 @@
           return list.find(item => item.objectId === objectId)
         })
         const newLest = list.filter(item => sortList.every(objectId => objectId !== item.objectId))
-        this.todoList = [].concat(newLest, isExist)
+        this.todoList = [].concat(newLest, isExist).filter(x => x)
       },
       // 重新排序清单 或 任务
       resort(result) {
@@ -852,6 +855,13 @@
             message: e.msg,
             type: 'error'
           })
+        })
+      },
+      resetPwd() {
+        db.resetPwd().then(() => {
+          this.$message.success('邮件已发送，请注意查收')
+        }).catch(msg => {
+          this.$message.error(msg)
         })
       }
     },
