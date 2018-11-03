@@ -4,6 +4,7 @@ let listOldElemChilds = null
 let finalIndex = 0
 // 目标容器的名称
 let endElemParentName = null
+let cateSurroundIndex = 0
 const elemMap = {}
 
 const targetLine = document.createElement('div')
@@ -22,7 +23,7 @@ function addTargetLine(pageX, pageY, originNode) {
   const rect = getBoxArea(pageX, pageY)
   if (rect) {
     endElemParentName = rect.name
-    console.log(endElemParentName)
+    // console.log(endElemParentName)
     const { top } = rect
     const arr = String((pageY - top) / itemHeight).split('.')
     const dot = arr[1] ? Number(`0.${arr[1]}`) : 0
@@ -95,6 +96,7 @@ function updateSort(elem) {
 }
 
 function addTargetSurround(wrapName, index) {
+  cateSurroundIndex = index
   if (!elemMap[wrapName]) {
     elemMap[wrapName] = document.querySelector(`.${wrapName}`)
   }
@@ -110,9 +112,10 @@ function addTargetSurround(wrapName, index) {
   })
 }
 
-function removeTargetSurround(wrapName, index) {
+function removeTargetSurround(wrapName, index = cateSurroundIndex) {
   const cls = 'category-item__content--target'
-  elemMap[wrapName].childNodes[index].childNodes[0].classList.remove(cls)
+  const target = elemMap[wrapName].childNodes[index]
+  target && target.childNodes[0] && target.childNodes[0].classList.remove(cls)
 }
 
 // 满足右侧任务拖拽到左侧清单

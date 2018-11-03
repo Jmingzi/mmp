@@ -478,6 +478,7 @@
             upCallBack: (elem) => {
               elem.classList.remove('dragging')
               removeTargetLine()
+              removeTargetSurround('todo__cate')
               const result = updateSort(elem)
               if (result && result.sort) {
                 // 对比排序是否发生变化
@@ -497,7 +498,7 @@
                 if (currentIndex !== targetIndex) {
                   this.moveList(elem.dataset.index, targetIndex)
                 }
-                removeTargetSurround('todo__cate', targetIndex)
+                // removeTargetSurround('todo__cate', targetIndex)
               }
             }
           })
