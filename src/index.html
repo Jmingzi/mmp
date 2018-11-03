@@ -395,6 +395,7 @@
       }
     },
     created() {
+      this.updateMessage()
       this.init()
     },
     mounted() {
@@ -464,7 +465,7 @@
             this.setActiveListId()
           }
           // 初始化拖拽
-          const drag = new Drag({
+          new Drag({
             selector: '.category-item',
             forbiddenSelector: '.input',
             downCallBack(elem) {
@@ -478,7 +479,7 @@
               elem.classList.remove('dragging')
               removeTargetLine()
               const result = updateSort(elem)
-              if (result) {
+              if (result && result.sort) {
                 // 对比排序是否发生变化
                 let isChange = false
                 for (let i = 0; i < result.sort.length; i++) {
@@ -488,6 +489,15 @@
                 }
                 console.log('isChange', isChange)
                 isChange && this.resort(result)
+              } else if (result && result.target) {
+                // 移动任务到清单
+                // 判断任务的清单是否变化
+                const currentIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
+                const targetIndex = Number(result.target.dataset.index)
+                if (currentIndex !== targetIndex) {
+                  this.moveList(elem.dataset.index, targetIndex)
+                }
+                removeTargetSurround('todo__cate', targetIndex)
               }
             }
           })
@@ -544,6 +554,25 @@
             loading.close()
           })
         }
+      },
+      // 移动任务到清单
+      moveList(currentListIndex, targetCategoryIndex) {
+        // 先将当前任务保存到新的清单中
+        if (!this.todoList[targetCategoryIndex].list) {
+          this.$set(this.todoList[targetCategoryIndex], 'list', [])
+        }
+        const targetItem = this.todoList[targetCategoryIndex]
+        const currentCateIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
+        const currentItem = this.todoList[currentCateIndex]
+        targetItem.list.unshift(currentItem.list[currentListIndex])
+        // 然后将当前任务在列表中移除
+        currentItem.list.splice(currentListIndex, 1)
+        Promise.all([
+            db.updateTodo({ list: targetItem.list }, targetItem.objectId),
+            db.updateTodo({ list: currentItem.list }, currentItem.objectId)
+        ]).catch(e => {
+          this.$message.error(e.message)
+        })
       },
       // 添加清单
       submitForm() {
@@ -760,6 +789,28 @@
             this.updateCategory('asserts', asserts)
           })
         })
+      },
+      updateMessage() {
+        const key = 'UPDATE_VERSION'
+        if (
+            !localStorage.getItem(key) ||
+            localStorage.getItem(key) !== '1'
+        ) {
+          const c = this.$createElement
+          this.$alert(
+              c(
+                  'div',
+                  [
+                      c('h3', { domProps: { innerText: '版本更新啦' } }),
+                      c('p', { domProps: { innerText: '1. 支持任务移动到清单' } }),
+                      c('p', { domProps: { innerText: '2. 支持任务上传附件' } }),
+                      c('p', { domProps: { innerText: '3. 支持拖拽排序' } })
+                  ]
+              )
+          ).then(() => {
+            localStorage.setItem(key, 1)
+          })
+        }
       }
     },
     template: document.getElementById('app-tpl').innerHTML

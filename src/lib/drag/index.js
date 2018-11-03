@@ -2,6 +2,9 @@ let itemHeight = 41
 let listWrapElem = null
 let listOldElemChilds = null
 let finalIndex = 0
+// 目标容器的名称
+let endElemParentName = null
+const elemMap = {}
 
 const targetLine = document.createElement('div')
 targetLine.classList.add('target-line')
@@ -17,21 +20,27 @@ function addTargetLine(pageX, pageY, originNode) {
     listOldElemChilds = Array.from(listWrapElem.childNodes)
   }
   const rect = getBoxArea(pageX, pageY)
-  if (
-      rect &&
-      listWrapElem.classList.contains(rect.name)
-  ) {
+  if (rect) {
+    endElemParentName = rect.name
+    console.log(endElemParentName)
     const { top } = rect
     const arr = String((pageY - top) / itemHeight).split('.')
     const dot = arr[1] ? Number(`0.${arr[1]}`) : 0
     const dir = dot >= 0 && dot < 0.5 ? 'before' : 'after'
     finalIndex = dir === 'after' ? (Number(arr[0]) + 1) : arr[0]
-    insert(targetLine)
+
+    if (listWrapElem.classList.contains(rect.name)) {
+      // 相同的父容器才可以添加目标线
+      insert(targetLine)
+    } else if (isSupportSurround()) {
+      // 不一致的时候 支持任务拖拽到清单
+      addTargetSurround(endElemParentName, finalIndex)
+    }
   }
 }
 
 function removeTargetLine() {
-  listWrapElem && listWrapElem.removeChild(targetLine)
+  listWrapElem && targetLine.remove()
 }
 
 function insert(node) {
@@ -65,12 +74,50 @@ function getBoxArea(x, y) {
 }
 
 function updateSort(elem) {
-  if (listWrapElem && listOldElemChilds) {
+  if (
+      listWrapElem &&
+      listOldElemChilds &&
+      listWrapElem.classList.contains(endElemParentName)
+  ) {
+    // 相同的容器才支持排序
     insert(elem)
     return {
       container: listWrapElem,
       sort: Array.from(listWrapElem.childNodes).map(x => x.dataset.index)
     }
+  } else if (isSupportSurround()) {
+    // 不同的容器支持任务移动
+    return {
+      target: elemMap['todo__cate'].childNodes[finalIndex]
+    }
   }
   return null
+}
+
+function addTargetSurround(wrapName, index) {
+  if (!elemMap[wrapName]) {
+    elemMap[wrapName] = document.querySelector(`.${wrapName}`)
+  }
+  let target
+  const cls = 'category-item__content--target'
+  Array.from(elemMap[wrapName].childNodes).forEach((child, i) => {
+    target = child.childNodes[0]
+    if (i === Number(index)) {
+      target.classList.add(cls)
+    } else {
+      target.classList.remove(cls)
+    }
+  })
+}
+
+function removeTargetSurround(wrapName, index) {
+  const cls = 'category-item__content--target'
+  elemMap[wrapName].childNodes[index].childNodes[0].classList.remove(cls)
+}
+
+// 满足右侧任务拖拽到左侧清单
+function isSupportSurround() {
+  return listWrapElem &&
+      /todo__list/.test(Array.from(listWrapElem.classList).join('')) &&
+      endElemParentName === 'todo__cate'
 }

@@ -154,9 +154,12 @@ div {
     display: flex;
     align-items: center;
     border-radius: 5px;
-    padding: 0 20px 0 0; }
+    padding: 0 20px 0 0;
+    border: 1px transparent dashed; }
     .category-item__content--active {
       background-color: rgba(153, 204, 255, 0.2); }
+    .category-item__content--target {
+      border-color: red; }
   .category-item__unCompleteNum {
     position: absolute;
     right: 5px;
