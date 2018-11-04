@@ -154,8 +154,9 @@ div {
     display: flex;
     align-items: center;
     border-radius: 5px;
-    padding: 0 20px 0 0;
-    border: 1px transparent dashed; }
+    padding: 0 20px 0 0; }
+    .category-item__content--border {
+      border: 1px transparent dashed; }
     .category-item__content--active {
       background-color: rgba(153, 204, 255, 0.2); }
     .category-item__content--target {

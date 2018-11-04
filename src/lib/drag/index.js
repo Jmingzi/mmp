@@ -1,3 +1,8 @@
+const CATE_LIST_NAME = 'todo__cate'
+const LIST_UN_COMPLETE = 'todo__list--unComplete'
+const LIST_COMPLETE = 'todo__list--complete-wrap'
+const TARGET_NAME = 'target-line'
+
 let itemHeight = 41
 let listWrapElem = null
 let listOldElemChilds = null
@@ -8,7 +13,7 @@ let cateSurroundIndex = 0
 const elemMap = {}
 
 const targetLine = document.createElement('div')
-targetLine.classList.add('target-line')
+targetLine.classList.add(TARGET_NAME)
 
 function beforeAdd() {
   listWrapElem = null
@@ -34,7 +39,7 @@ function addTargetLine(pageX, pageY, originNode) {
       // 相同的父容器才可以添加目标线
       insert(targetLine)
       // 把surround去掉
-      removeTargetSurround('todo__cate')
+      removeTargetSurround(CATE_LIST_NAME)
     } else if (isSupportSurround()) {
       // 不一致的时候 支持任务拖拽到清单
       addTargetSurround(endElemParentName, finalIndex)
@@ -62,9 +67,9 @@ let boxAreaMap = null
 function getBoxArea(x, y) {
   if (!boxAreaMap) {
     boxAreaMap = {
-      'todo__cate': document.querySelector('.todo__cate').getBoundingClientRect(),
-      'todo__list--unComplete': document.querySelector('.todo__list--unComplete').getBoundingClientRect(),
-      'todo__list--complete-wrap': document.querySelector('.todo__list--complete-wrap').getBoundingClientRect()
+      [CATE_LIST_NAME]: document.querySelector(`.${CATE_LIST_NAME}`).getBoundingClientRect(),
+      [LIST_UN_COMPLETE]: document.querySelector(`.${LIST_UN_COMPLETE}`).getBoundingClientRect(),
+      [LIST_COMPLETE]: document.querySelector(`.${LIST_COMPLETE}`).getBoundingClientRect()
     }
   }
 
@@ -95,7 +100,7 @@ function updateSort(elem) {
   } else if (isSupportSurround()) {
     // 不同的容器支持任务移动
     return {
-      target: elemMap['todo__cate'].childNodes[finalIndex]
+      target: elemMap[CATE_LIST_NAME].childNodes[finalIndex]
     }
   }
   return null
@@ -130,5 +135,5 @@ function removeTargetSurround(wrapName, index = cateSurroundIndex) {
 function isSupportSurround() {
   return listWrapElem &&
       /todo__list/.test(Array.from(listWrapElem.classList).join('')) &&
-      endElemParentName === 'todo__cate'
+      endElemParentName === CATE_LIST_NAME
 }

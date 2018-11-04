@@ -192,7 +192,8 @@
         <div
             class="category-item__content"
             :class="{
-                'category-item__content--active': activeId === item[hasCheckbox ? 'id' : 'objectId']
+                'category-item__content--active': activeId === item[hasCheckbox ? 'id' : 'objectId'],
+                'category-item__content--border': !hasCheckbox
             }"
         >
             <template v-if="false">
@@ -478,7 +479,7 @@
             upCallBack: (elem) => {
               elem.classList.remove('dragging')
               removeTargetLine()
-              removeTargetSurround('todo__cate')
+              removeTargetSurround(CATE_LIST_NAME)
               const result = updateSort(elem)
               if (result && result.sort) {
                 // 对比排序是否发生变化
@@ -517,7 +518,7 @@
         const { container, sort } = result
         const userId = this.currentUser.objectId
         const loading = this.$loading()
-        if (container.classList.contains('todo__cate')) {
+        if (container.classList.contains(CATE_LIST_NAME)) {
           const finalSort = sort.map(i => this.todoList[i].objectId)
           if (this.sortMap[userId]) {
             // update
