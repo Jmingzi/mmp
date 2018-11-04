@@ -33,9 +33,15 @@ function addTargetLine(pageX, pageY, originNode) {
     if (listWrapElem.classList.contains(rect.name)) {
       // 相同的父容器才可以添加目标线
       insert(targetLine)
+      // 把surround去掉
+      removeTargetSurround('todo__cate')
     } else if (isSupportSurround()) {
       // 不一致的时候 支持任务拖拽到清单
       addTargetSurround(endElemParentName, finalIndex)
+      // 把target line 去掉
+      removeTargetLine()
+    } else {
+      // console.log('remove')
     }
   }
 }
