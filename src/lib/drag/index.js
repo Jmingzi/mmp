@@ -113,9 +113,11 @@ function addTargetSurround(wrapName, index) {
 }
 
 function removeTargetSurround(wrapName, index = cateSurroundIndex) {
-  const cls = 'category-item__content--target'
-  const target = elemMap[wrapName].childNodes[index]
-  target && target.childNodes[0] && target.childNodes[0].classList.remove(cls)
+  if (elemMap[wrapName] && elemMap[wrapName].childNodes.length) {
+    const cls = 'category-item__content--target'
+    const target = elemMap[wrapName].childNodes[index]
+    target && target.childNodes[0] && target.childNodes[0].classList.remove(cls)
+  }
 }
 
 // 满足右侧任务拖拽到左侧清单
