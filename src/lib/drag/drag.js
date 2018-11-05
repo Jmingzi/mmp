@@ -39,6 +39,7 @@ class Drag {
       // console.log('start')
 
       dragNode = moveElem.cloneNode(true)
+      dragNode.style.display = 'none'
       dragNode.style.width = `${clientRect.width}px`
       document.body.appendChild(dragNode)
       downCallBack && downCallBack(dragNode)
@@ -51,6 +52,7 @@ class Drag {
         endLeft = e.pageX - startDiffLeft
         endTop = e.pageY - startDiffTop
 
+        dragNode.style.display = ''
         dragNode.style.left = `${endLeft}px`
         dragNode.style.top = `${endTop}px`
         this.options.moveCallBack && this.options.moveCallBack(dragNode, { x: endLeft, y: endTop }, moveElem)
