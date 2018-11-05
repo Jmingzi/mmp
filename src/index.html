@@ -188,7 +188,12 @@
     </div>
 </script>
 <script type="text/html" id="category-tpl">
-    <div class="category-item" :style="{ borderColor: item.color }" :data-index="dataIndex">
+    <div
+        class="category-item"
+        :style="{ borderColor: item.color }"
+        :data-index="dataIndex"
+        :data-id="item.id"
+    >
         <div
             class="category-item__content"
             :class="{
@@ -494,12 +499,15 @@
               } else if (result && result.target) {
                 // 移动任务到清单
                 // 判断任务的清单是否变化
-                const currentIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
+                const currentId = Number(elem.dataset.id)
+                const currentIndex = this.currentCategory.list.findIndex(x => x.id === currentId)
+                const currentCateIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
                 const targetIndex = Number(result.target.dataset.index)
-                if (currentIndex !== targetIndex) {
-                  this.moveList(elem.dataset.index, targetIndex)
+                if (currentCateIndex !== targetIndex) {
+                  this.moveList(currentIndex, targetIndex, currentCateIndex)
+                } else {
+                  console.log('cate index not change')
                 }
-                // removeTargetSurround('todo__cate', targetIndex)
               }
             }
           })
@@ -558,13 +566,14 @@
         }
       },
       // 移动任务到清单
-      moveList(currentListIndex, targetCategoryIndex) {
+      moveList(currentListIndex, targetCategoryIndex, currentCateIndex) {
+        console.log(`currentListIndex: ${currentListIndex}. targetCategoryIndex: ${targetCategoryIndex}. currentCateIndex: ${currentCateIndex}`)
         // 先将当前任务保存到新的清单中
         if (!this.todoList[targetCategoryIndex].list) {
           this.$set(this.todoList[targetCategoryIndex], 'list', [])
         }
         const targetItem = this.todoList[targetCategoryIndex]
-        const currentCateIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
+        // const currentCateIndex = this.todoList.findIndex(x => x.objectId === this.currentCategory.objectId)
         const currentItem = this.todoList[currentCateIndex]
         targetItem.list.unshift(currentItem.list[currentListIndex])
         // 然后将当前任务在列表中移除

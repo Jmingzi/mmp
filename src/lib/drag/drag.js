@@ -36,7 +36,7 @@ class Drag {
       clientRect = moveElem.getBoundingClientRect()
       startDiffLeft = e.pageX - clientRect.left
       startDiffTop = e.pageY - clientRect.top
-      console.log('start')
+      // console.log('start')
 
       dragNode = moveElem.cloneNode(true)
       dragNode.style.width = `${clientRect.width}px`
@@ -65,7 +65,7 @@ class Drag {
         document.body.removeChild(dragNode)
         moveAble = false
         moveElem = null
-        console.log('end')
+        // console.log('end')
       }
     })
   }
