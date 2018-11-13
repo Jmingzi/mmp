@@ -323,7 +323,11 @@
     </div>
 </script>
 <script>
-  // Vue.use(VueDragging)
+  window.nowDate = (() => {
+    const date = new Date()
+    return new Date(`${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} 00:00:00`).getTime()
+  })()
+
   Vue.component('category-item', {
     data() {
       return {
@@ -333,7 +337,13 @@
     filters: {
       formatDate(time) {
       	if (!time) {
-      		return ''
+          return ''
+        } else if (time === window.nowDate) {
+          return '今天'
+        } else if (time === window.nowDate + 24 * 3600 * 1000) {
+          return '明天'
+        } else if (time === window.nowDate + 24 * 3600 * 1000 * 2) {
+          return '后天'
         }
 	    time = new Date(time)
         const m = time.getMonth() + 1
@@ -450,13 +460,9 @@
           this.currentCategory.list.find(x => x.id === this.activeListId) || {} :
           {}
       },
-      nowDate() {
-      	const date = new Date()
-        return new Date(`${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} 00:00:00`).getTime()
-      },
       isOverPlanDate() {
       	const { planDate } = this.currentList
-        return planDate <= this.nowDate
+        return planDate <= window.nowDate
       },
       // 当前任务列表 分为已完成 未完成
       currentCategoryList() {
