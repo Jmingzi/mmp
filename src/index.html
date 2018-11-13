@@ -813,15 +813,15 @@
           })
         }
       },
-      selectCategory(item) {
-        this.beforeSelect().then(() => {
-          this.activeCategoryId = item.objectId
-          this.setActiveListId()
-        })
+      async selectCategory(item) {
+        await this.beforeSelect()
+        this.activeCategoryId = item.objectId
+        this.setActiveListId()
       },
       async selectList(item) {
         await this.beforeSelect()
         this.activeListId = item.id
+        this.planDate = item.planDate
       },
       beforeSelect() {
         if (this.timer) {
