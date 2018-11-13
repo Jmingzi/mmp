@@ -338,16 +338,19 @@
       formatDate(time) {
       	if (!time) {
           return ''
-        } else if (time === window.nowDate) {
+        }
+        time = new Date(time)
+        const y = time.getFullYear()
+        const m = time.getMonth() + 1
+        const d = time.getDate()
+        time = new Date(`${y}/${m}/${d} 00:00:00`).getTime()
+        if (time === window.nowDate) {
           return '今天'
         } else if (time === window.nowDate + 24 * 3600 * 1000) {
           return '明天'
         } else if (time === window.nowDate + 24 * 3600 * 1000 * 2) {
           return '后天'
         }
-	    time = new Date(time)
-        const m = time.getMonth() + 1
-        const d = time.getDate()
         return `${m}月${d}日`
       }
     },
@@ -910,7 +913,7 @@
                   ]
               )
           ).then(() => {
-            localStorage.setItem(key, 1)
+            localStorage.setItem(key, 2)
           })
         }
       }
