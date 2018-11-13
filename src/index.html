@@ -46,27 +46,30 @@
             </span>
         </p>
         <div class="todo__category">
-            <el-tabs v-model="activeTabName" stretch>
+            <h1 class="app-title">
+                Miss 清单
+                <span class="tips">至简、至臻</span>
+            </h1>
+            <template>
+                <div class="todo__add" @click="toAddTodo">
+                    <i class="el-icon-plus"></i>
+                    <span>添加清单</span>
+                </div>
+                <div class="todo__cate">
+                    <category-item
+                            v-for="(item, i) in todoList"
+                            :key="item.objectId"
+                            :item="item"
+                            :data-index="i"
+                            :active-id="activeCategoryId"
+                            @click.native="selectCategory(item)"
+                            @contextmenu.native.prevent="e => toEditTodo(e, item)"
+                    >
+                    </category-item>
+                </div>
+            </template>
+            <el-tabs v-if="false" v-model="activeTabName" stretch>
                 <el-tab-pane label="清单列表" name="first">
-                    <template>
-                        <div class="todo__add" @click="toAddTodo">
-                            <i class="el-icon-plus"></i>
-                            <span>添加清单</span>
-                        </div>
-                        <div class="todo__cate">
-                            <category-item
-                                v-for="(item, i) in todoList"
-                                :key="item.objectId"
-                                :item="item"
-                                :data-index="i"
-                                :active-id="activeCategoryId"
-                                @click.native="selectCategory(item)"
-                                @contextmenu.native.prevent="e => toEditTodo(e, item)"
-                            >
-                            </category-item>
-                        </div>
-                    </template>
-
                 </el-tab-pane>
                 <el-tab-pane label="数据统计" name="second" disabled>数据统计</el-tab-pane>
             </el-tabs>
@@ -123,6 +126,27 @@
         <div class="todo__content" :style="appColumWidth">
             <div class="todo__content--wrap">
                 <template v-if="currentList.name">
+                    <div class="todo__content--date">
+                        <el-date-picker
+                            v-model="planDate"
+                            :class="{
+                                'over-plan-date': isOverPlanDate
+                            }"
+                            :editable="false"
+                            :picker-options="planDateOptions"
+                            :clearable="false"
+                            size="mini"
+                            placeholder="设置日期"
+                            type="date"
+                            format="MM月dd日"
+                            @change="updateListPlanDate"
+                        >
+                        </el-date-picker>
+                        <div class="over-date" v-if="isOverPlanDate">
+                            <i class="el-icon-warning"></i>
+                            即将或已过期
+                        </div>
+                    </div>
                     <div class="todo__content--top">
                         <h2>{{ currentList.name }}</h2>
                     </div>
@@ -236,6 +260,10 @@
                         @input="updateListName"
                         @keyup.delete="$parent.deleteListName"
                     >
+                    <div v-if="item.content || item.planDate" class="category-item__info">
+                        <i v-if="item.content" class="el-icon-document"></i>
+                        <span>{{ item.planDate | formatDate }}</span>
+                    </div>
                 </template>
                 <span class="category-item__word-wrap" v-else>{{ item.name }}</span>
             </div>
@@ -302,6 +330,17 @@
         inputValue: undefined
       }
     },
+    filters: {
+      formatDate(time) {
+      	if (!time) {
+      		return ''
+        }
+	    time = new Date(time)
+        const m = time.getMonth() + 1
+        const d = time.getDate()
+        return `${m}月${d}日`
+      }
+    },
     props: {
       item: Object,
       activeId: String,
@@ -354,20 +393,50 @@
           ]
         },
         colorConstant: [
-          { id: 0, value: '' },
+          { id: 0, value: '#B19693' },
           { id: 1, value: '#339999' },
-          { id: 2, value: '#9933CC' },
-          { id: 3, value: '#FFCC33' },
+          { id: 2, value: '#FF5C57' },
+          { id: 3, value: '#D9AB42' },
           { id: 4, value: '#6666CC' },
-          { id: 5, value: '#CC3333' },
-          { id: 6, value: '#663366' },
+          { id: 5, value: '#B05C55' },
+          { id: 6, value: '#90B44B' },
           { id: 7, value: '#FF99CC' },
           { id: 8, value: '#66CCCC' },
-          { id: 9, value: '#CCCCCC' }
+          { id: 9, value: '#E83015' }
         ],
         currentEditItem: null,
         timer: null,
-        sortMap: {}
+        sortMap: {},
+        planDate: '',
+        planDateOptions: {
+          shortcuts: [{
+              text: '今天',
+              onClick(picker) {
+                  picker.$emit('pick', new Date())
+              }
+          }, {
+              text: '明天',
+              onClick(picker) {
+                  const date = new Date()
+                  date.setTime(date.getTime() + 3600 * 1000 * 24)
+                  picker.$emit('pick', date)
+              }
+          }, {
+	          text: '后天',
+	          onClick(picker) {
+		          const date = new Date()
+		          date.setTime(date.getTime() + 3600 * 1000 * 24 * 2)
+		          picker.$emit('pick', date)
+	          }
+          }, {
+              text: '一周后',
+              onClick(picker) {
+                  const date = new Date()
+                  date.setTime(date.getTime() + 3600 * 1000 * 24 * 7)
+                  picker.$emit('pick', date)
+              }
+          }]
+        }
       }
     },
     computed: {
@@ -380,6 +449,14 @@
         return this.currentCategory.list ?
           this.currentCategory.list.find(x => x.id === this.activeListId) || {} :
           {}
+      },
+      nowDate() {
+      	const date = new Date()
+        return new Date(`${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()} 00:00:00`).getTime()
+      },
+      isOverPlanDate() {
+      	const { planDate } = this.currentList
+        return planDate <= this.nowDate
       },
       // 当前任务列表 分为已完成 未完成
       currentCategoryList() {
@@ -711,6 +788,13 @@
         this.autoSave = 0
         this.timer = setTimeout(common, 5 * 1000)
       },
+      updateListPlanDate(time) {
+      	// console.log(time.getTime())
+        this.updateCategory('list', {
+          ...this.currentList,
+          planDate: time.getTime()
+        })
+      },
       // 删除任务
       deleteListName() {
         if (this.currentList.isNameEmpty) {
@@ -746,6 +830,7 @@
         this.$nextTick(() => {
           const { complete, unComplete } = this.currentCategoryList
           this.activeListId = unComplete[0] ? unComplete[0].id : complete[0] && complete[0].id
+          this.planDate = this.currentList.planDate
         })
       },
       paste(e) {
@@ -805,7 +890,7 @@
         const key = 'UPDATE_VERSION'
         if (
             !localStorage.getItem(key) ||
-            localStorage.getItem(key) !== '1'
+            localStorage.getItem(key) !== '2'
         ) {
           const c = this.$createElement
           this.$alert(
@@ -813,9 +898,9 @@
                   'div',
                   [
                       c('h3', { domProps: { innerText: '版本更新啦' } }),
-                      c('p', { domProps: { innerText: '1. 支持任务移动到清单' } }),
-                      c('p', { domProps: { innerText: '2. 支持任务上传附件' } }),
-                      c('p', { domProps: { innerText: '3. 支持拖拽排序' } })
+                      c('p', { domProps: { innerText: '1. 更新了清单颜色' } }),
+                      c('p', { domProps: { innerText: '2. 任务可以设置时间了' } }),
+                      c('p', { domProps: { innerText: '3. 新增了任务内容小icon' } })
                   ]
               )
           ).then(() => {
