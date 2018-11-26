@@ -7,23 +7,21 @@ if (window.require) {
     reloadWatcher.close()
   })
 
-  // const nwGui = require('nw.gui')
   const win = nw.Window.get()
   // win.showDevTools()
-  win.on('loading', function(e) {
+  // win.on('loading', function() {
     // win.close(true)
     // alert('loading')
-  })
+  // })
 
-  win.on('close', function() {
-    alert(1)
-    // this.hide()
+  win.on('close', function(e) {
+    this.hide()
     //hide隐藏起来(最小化)
     // win.hide()
-    // //(mac上菜单中的退出事件)
-    // if (e === 'quit') {
-    //   win.close(true)
-    // }
+    //(mac上菜单中的退出事件)
+    if (e === 'quit') {
+      win.close(true)
+    }
   })
 
   // var platform = navigator.platform;
@@ -32,7 +30,7 @@ if (window.require) {
   // 初始化托盘图标
   var tray = tray = new nw.Tray({
     icon: 'icon/icon.icns',
-    title: 'Miss'
+    title: 'miss-todo'
   })
 
   // 创建菜单
@@ -40,10 +38,11 @@ if (window.require) {
   // 添加子菜单
   menu.append(new nw.MenuItem({
     type: 'normal',
-    label: '打开Miss清单',
+    label: '刷新系统',
     click: function(){
-      win.focus()
-      win.show()
+      // win.focus()
+      // win.show()
+      win.location.reload(true)
     }
   }))
   menu.append(new nw.MenuItem({
@@ -58,31 +57,15 @@ if (window.require) {
   }))
   tray.menu = menu
   // 点击托盘图标时激活窗体
-  // tray.on('click',function(){
-    // win.focus();
-    // win.show();
-    // alert(1)
-  // })
+  tray.on('click',function(){
+    win.focus()
+    win.show()
+  })
   // mac上点击dock图标时，reopen事件，激活窗体。否则挂载托盘图标后，dock图标的点击事件失效
-  // nw.App.on('reopen', function(){
-  //   win.show();
-  //   win.focus();
-  // });
-
-  // const todoListMenu = new nw.Menu()
-  //
-  // todoListMenu.append(new nw.MenuItem({
-  //   label: '编辑',
-  //   click() {
-  //     // alert('You have clicked at "Item A"')
-  //   }
-  // }))
-  // todoListMenu.append(new nw.MenuItem({
-  //   label: '删除' ,
-  //   click() {
-  //
-  //   }
-  // }))
+  nw.App.on('reopen', function(){
+    win.show()
+    win.focus()
+  })
 
   // document.body.addEventListener('contextmenu', function(ev) {
   //   // Prevent showing default context menu

@@ -8,7 +8,9 @@ gulp.task('nw', function () {
     files: './src/**',
     // macIcns: './icons/icon.icns',
     // macPlist: {mac_bundle_id: 'myPkg'},
-    platforms: ['osx64', 'win64']
+    // platforms: ['osx64', 'win64'],
+    platforms: ['osx64'],
+    macIcns: './icon/icon.icns'
   })
 
   // Log stuff you want

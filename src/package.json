@@ -1,11 +1,11 @@
 {
   "main": "index.html",
-  "name": "Miss 清单",
+  "name": "miss-todo",
   "description": "Miss 清单系统",
   "version": "0.1.0",
   "keywords": [ "Miss", "清单" ],
   "window": {
-    "icon": "link.png",
+    "icon": "../icon/icon.icns",
     "toolbar": true,
     "width": 1000,
     "height": 600,
