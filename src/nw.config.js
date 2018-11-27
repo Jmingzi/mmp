@@ -1,5 +1,5 @@
-alert(require)
-if (require) {
+alert(nw)
+if (nw) {
   const path = './'
   const fs = require('fs')
 
