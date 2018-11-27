@@ -8,43 +8,31 @@ if (window.require) {
   })
 
   const win = nw.Window.get()
-  // win.showDevTools()
-  // win.on('loading', function() {
-    // win.close(true)
-    // alert('loading')
-  // })
 
   win.on('close', function(e) {
     this.hide()
-    //hide隐藏起来(最小化)
-    // win.hide()
     //(mac上菜单中的退出事件)
     if (e === 'quit') {
       win.close(true)
     }
   })
 
-  // var platform = navigator.platform;
-  // var isMac = platform == 'Mac68k' || platform == 'MacPPC' || platform == 'Macintosh' || platform == 'MacIntel';
-  // var isMac = /Mac68k|MacPPC|Macintosh|MacIntel/i.test(platform)
   // 初始化托盘图标
-  var tray = tray = new nw.Tray({
+  var tray = new nw.Tray({
     icon: 'icon/icon.icns',
-    title: 'miss-todo'
+    title: 'miss'
   })
 
   // 创建菜单
   var menu = new nw.Menu()
   // 添加子菜单
-  menu.append(new nw.MenuItem({
-    type: 'normal',
-    label: '刷新系统',
-    click: function(){
-      // win.focus()
-      // win.show()
-      win.location.reload(true)
-    }
-  }))
+  // menu.append(new nw.MenuItem({
+  //   type: 'normal',
+  //   label: '截图',
+  //   click: function(){
+  //     // win.reload()
+  //   }
+  // }))
   menu.append(new nw.MenuItem({
     type: 'normal',
     label:'退出',
@@ -61,7 +49,7 @@ if (window.require) {
     win.focus()
     win.show()
   })
-  // mac上点击dock图标时，reopen事件，激活窗体。否则挂载托盘图标后，dock图标的点击事件失效
+
   nw.App.on('reopen', function(){
     win.show()
     win.focus()
@@ -73,5 +61,5 @@ if (window.require) {
   //   // Popup the native context menu at place you click
   //   todoListMenu.popup(ev.x, ev.y);
   //   return false;
-  // }, false);
+  // }, false)
 }
