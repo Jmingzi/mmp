@@ -26,13 +26,13 @@ if (window.require) {
   // 创建菜单
   var menu = new nw.Menu()
   // 添加子菜单
-  // menu.append(new nw.MenuItem({
-  //   type: 'normal',
-  //   label: '截图',
-  //   click: function(){
-  //     // win.reload()
-  //   }
-  // }))
+  menu.append(new nw.MenuItem({
+    type: 'normal',
+    label: '清除缓存',
+    click: function(){
+      nw.App.clearCache()
+    }
+  }))
   menu.append(new nw.MenuItem({
     type: 'normal',
     label:'退出',
