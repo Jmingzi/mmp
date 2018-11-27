@@ -1,4 +1,3 @@
-alert(nw)
 // if (require) {
 //   const path = './'
 //   const fs = require('fs')
