@@ -1,14 +1,11 @@
-var NwBuilder = require('nw-builder')
-var gulp = require('gulp')
-var gutil = require('gulp-util')
+const NwBuilder = require('nw-builder')
+const gulp = require('gulp')
+const gutil = require('gulp-util')
+const path = require('path')
 
 gulp.task('nw', function () {
   var nw = new NwBuilder({
-    // version: '0.14.6',
-    files: './src/**',
-    // macIcns: './icons/icon.icns',
-    // macPlist: {mac_bundle_id: 'myPkg'},
-    // platforms: ['osx64', 'win64'],
+    files: [path.resolve(__dirname, './src/**')],
     platforms: ['osx64'],
     macIcns: './icon/icon.icns'
   })
