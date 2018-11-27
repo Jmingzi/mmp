@@ -4,6 +4,7 @@
   "description": "Miss 清单系统",
   "version": "0.1.0",
   "keywords": [ "Miss", "清单" ],
+  "chromium-args": "--mixed-context",
   "window": {
     "icon": "../icon/icon.icns",
     "toolbar": true,
