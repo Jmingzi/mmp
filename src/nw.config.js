@@ -1,4 +1,3 @@
-alert(nw)
 if (nw) {
   const path = './'
   const fs = require('fs')
@@ -64,9 +63,8 @@ if (nw) {
     win.focus()
   })
 
-  document.body.addEventListener('contextmenu', function(ev) {
+  // document.body.addEventListener('contextmenu', function(ev) {
     // Prevent showing default context menu
     // ev.preventDefault();
-    alert(1)
-  }, false)
+  // }, false)
 }
