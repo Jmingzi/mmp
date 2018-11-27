@@ -1,4 +1,3 @@
-alert(JSON.stringify(global))
 alert(JSON.stringify(window))
 if (JSON.stringify(window)) {
   const path = './'
