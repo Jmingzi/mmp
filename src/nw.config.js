@@ -1,3 +1,4 @@
+alert(window.require)
 if (window.require) {
   const path = './'
   const fs = require('fs')
