@@ -1,5 +1,5 @@
-alert(JSON.stringify(window))
-if (JSON.stringify(window)) {
+alert(window)
+if (window) {
   const path = './'
   const fs = require('fs')
 
