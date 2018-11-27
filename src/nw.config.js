@@ -35,6 +35,14 @@ if (window.require) {
   }))
   menu.append(new nw.MenuItem({
     type: 'normal',
+    label: '打开控制台',
+    click: function(){
+      // nw.App.clearCache()
+      win.showDevTools()
+    }
+  }))
+  menu.append(new nw.MenuItem({
+    type: 'normal',
     label:'退出',
     click: function(){
       tray.remove()
@@ -55,11 +63,9 @@ if (window.require) {
     win.focus()
   })
 
-  // document.body.addEventListener('contextmenu', function(ev) {
-  //   // Prevent showing default context menu
-  //   ev.preventDefault();
-  //   // Popup the native context menu at place you click
-  //   todoListMenu.popup(ev.x, ev.y);
-  //   return false;
-  // }, false)
+  document.body.addEventListener('contextmenu', function(ev) {
+    // Prevent showing default context menu
+    // ev.preventDefault();
+    alert(1)
+  }, false)
 }
