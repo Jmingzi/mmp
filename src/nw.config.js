@@ -25,19 +25,26 @@ if (window.nw) {
 
   // 创建菜单
   var menu = new nw.Menu()
-  // 添加子菜单
+  menu.append(new nw.MenuItem({
+    type: 'normal',
+    label: '打开应用',
+    click: function(){
+      win.focus()
+      win.show()
+    }
+  }))
   menu.append(new nw.MenuItem({
     type: 'normal',
     label: '清除缓存',
     click: function(){
       nw.App.clearCache()
+      location.reload()
     }
   }))
   menu.append(new nw.MenuItem({
     type: 'normal',
     label: '打开控制台',
     click: function(){
-      // nw.App.clearCache()
       win.showDevTools()
     }
   }))
@@ -63,9 +70,7 @@ if (window.nw) {
     win.focus()
   })
 
-  // nw.App.addOriginAccessWhitelistEntry('https://iyzwnl2h.api.lncld.net', 'http', location.host, true)
-  // document.body.addEventListener('contextmenu', function(ev) {
-    // Prevent showing default context menu
-    // ev.preventDefault();
-  // }, false)
+  document.body.addEventListener('contextmenu', function(ev) {
+    ev.preventDefault()
+  }, false)
 }
