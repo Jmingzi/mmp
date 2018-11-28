@@ -6,6 +6,7 @@
   "keywords": [ "Miss", "清单" ],
   "nodejs": true,
   "node-remote": "http://miss.iming.work",
+  "chromium-args": "--disable-web-security",
   "window": {
     "icon": "../icon/icon.icns",
     "toolbar": true,
@@ -26,12 +27,5 @@
     "plugin": false,
     "java": false,
     "page-cache": false
-  },
-  "web_accessible_resources": [
-    "http://miss.iming.work/index.html",
-    "http://miss.iming.work/db.js",
-    "http://miss.iming.work/cache.js",
-    "http://miss.iming.work/index.css",
-    "http://miss.iming.work/lib/*"
-  ]
+  }
 }

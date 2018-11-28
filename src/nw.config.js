@@ -63,7 +63,7 @@ if (window.nw) {
     win.focus()
   })
 
-  nw.App.addOriginAccessWhitelistEntry('https://iyzwnl2h.api.lncld.net', 'http', location.host, true)
+  // nw.App.addOriginAccessWhitelistEntry('https://iyzwnl2h.api.lncld.net', 'http', location.host, true)
   // document.body.addEventListener('contextmenu', function(ev) {
     // Prevent showing default context menu
     // ev.preventDefault();
