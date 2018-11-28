@@ -26,5 +26,11 @@
     "plugin": false,
     "java": false,
     "page-cache": false
-  }
+  },
+  "web_accessible_resources": [
+    "index.html",
+    "db.js",
+    "cache.js",
+    "index.css"
+  ]
 }
