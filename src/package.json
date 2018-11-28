@@ -28,9 +28,10 @@
     "page-cache": false
   },
   "web_accessible_resources": [
-    "index.html",
-    "db.js",
-    "cache.js",
-    "index.css"
+    "http://miss.iming.work/index.html",
+    "http://miss.iming.work/db.js",
+    "http://miss.iming.work/cache.js",
+    "http://miss.iming.work/index.css",
+    "http://miss.iming.work/lib/*"
   ]
 }
