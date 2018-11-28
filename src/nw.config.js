@@ -39,7 +39,10 @@ if (window.nw) {
     click: function(){
       nw.App.clearCache()
       // location.reload()
-      nw.App.reopen()
+      // nw.App.reopen()
+      alert('清除缓存后需要重新打开应用才能生效！')
+      win.close(true)
+      win.open()
     }
   }))
   menu.append(new nw.MenuItem({
