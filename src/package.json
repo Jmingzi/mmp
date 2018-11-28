@@ -2,7 +2,7 @@
   "main": "http://miss.iming.work",
   "name": "miss",
   "description": "Miss 清单系统",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "keywords": [ "Miss", "清单" ],
   "nodejs": true,
   "node-remote": "http://miss.iming.work",

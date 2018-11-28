@@ -38,7 +38,8 @@ if (window.nw) {
     label: '清除缓存',
     click: function(){
       nw.App.clearCache()
-      location.reload()
+      // location.reload()
+      nw.App.reopen()
     }
   }))
   menu.append(new nw.MenuItem({
