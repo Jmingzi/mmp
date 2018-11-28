@@ -1,10 +1,11 @@
 {
-  "main": "index.html",
+  "main": "http://miss.iming.work",
   "name": "miss",
   "description": "Miss 清单系统",
   "version": "1.0.0",
   "keywords": [ "Miss", "清单" ],
   "nodejs": true,
+  "node-remote": "http://miss.iming.work",
   "window": {
     "icon": "../icon/icon.icns",
     "toolbar": true,
